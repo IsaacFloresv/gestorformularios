@@ -1396,7 +1396,7 @@ const CompFormpres = () => {
         required>
         <div className="container">
           <div className="row">
-            <div className="col-md-6">
+            <div className="col-md-6">              
               <button type="submit" disabled className="d-none"></button>
               <h3 className="clrTitle">Datos del registro </h3>
             </div>
