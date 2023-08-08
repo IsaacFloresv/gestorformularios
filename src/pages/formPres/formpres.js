@@ -1244,6 +1244,7 @@ const CompFormpres = () => {
   //Solicitud a DB
   const cargarDatosP = async (val, ub) => {
     const Ub = ub;
+    try {
     await fetch(URI + "pers/" + val)
       .then((resp) => resp.json())
       .then((data) => {
@@ -1269,6 +1270,9 @@ const CompFormpres = () => {
           cargarDatosC(val, Ub);
         }
       });
+      } catch (error) {
+      
+    }
   };
 
   const cargarDatosC = async (val, ub) => {
