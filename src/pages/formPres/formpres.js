@@ -616,7 +616,7 @@ const input_TIDCchange = (val, tID) => {
   const changeTeloEmail = (val, ub) => {
     if (ub === 1) {
       if (val?.target.checked) {
-        setEmail2("No indica");
+        setEmail2("NO INDICA");
         setdehabilem2(true);
         setemClValid2("");
         setCheckEm2(true)
@@ -640,7 +640,7 @@ const input_TIDCchange = (val, tID) => {
       }
     }else if (ub === 3) {
       if (val?.target.checked) {
-        setEmail("No indica");
+        setEmail("NO INDICA");
         setdehabilem1(true);
         setemClValid("");
         setCheckEm1(true)
@@ -1533,7 +1533,7 @@ const cargarDatosC = async (val, ub) => {
             </div>
             <div id="divinputtoRegistro" className={hiddentelObser}>
               <label htmlFor="usobserv" className="form-label">
-                Observasión:
+                Observación:
               </label>
               <input
                 name="usobserv"
