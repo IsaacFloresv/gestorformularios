@@ -1352,6 +1352,7 @@ const cargarDatosC = async (val, ub) => {
                     setlblapell1A('Nombre de Fantasía (Opcional)')
                     setnombA(nombreM)
                     setapell1A(nombreN)
+                    setapell2A("NO INDICA");
                     ValidarinputNomb(nombreM, val)
                     console.log('Existen ambos')
                 }
