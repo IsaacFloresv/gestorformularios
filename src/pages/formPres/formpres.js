@@ -141,41 +141,41 @@ const CompFormpres = () => {
     NextRegister()
     const NR = 1;
     if (NR != null) {
-        if (
-          (telorigen != "" && telorigen != " ") &&
-          (agente != "" && agente != " ") &&
-          (usobser != "" && usobser != " ") &&
-          (ndiA != "" && ndiA != " ") &&
-          (nombA != "" && nombA != " ") &&
-          (apell1A != "" && apell1A != " ") &&
-          (apell2A != "" && apell2A != " ") &&
-          (email2 != "" && email2 != " ") &&
-          (email != "" && email != " ") &&
-          (tel != "" && tel != " ") &&
-          (tel2 != "" && tel2 != " ") &&
-          (fchaHech != "" && fchaHech != " ") &&
-          (fchaGar != "" && fchaGar != " ") &&
-          (prov != false) &&
-          (cant != false) &&
-          (distr != false) &&
-          (ubMat != '') &&
-          (ubAsu != '') &&
-          (ubBie != '') &&
-          (tdiC != null && tdiC != " ") &&
-          (ndiC != null && ndiC != " ") &&
-          (nombC != "" && nombC != " ") &&
-          (apell1C != "" && apell1C != " ") &&
-          (apell2C != "" && apell2C != " ") &&
-          (descH != "" && descH != " ") &&
-          (resp != "" && resp != " ")
-        ) {
-          EnviarDatos();
-        } else {
-          alert("faltan datos");
-        }
+      if (
+        (telorigen != "" && telorigen != " ") &&
+        (agente != "" && agente != " ") &&
+        (usobser != "" && usobser != " ") &&
+        (ndiA != "" && ndiA != " ") &&
+        (nombA != "" && nombA != " ") &&
+        (apell1A != "" && apell1A != " ") &&
+        (apell2A != "" && apell2A != " ") &&
+        (email2 != "" && email2 != " ") &&
+        (email != "" && email != " ") &&
+        (tel != "" && tel != " ") &&
+        (tel2 != "" && tel2 != " ") &&
+        (fchaHech != "" && fchaHech != " ") &&
+        (fchaGar != "" && fchaGar != " ") &&
+        (prov != false) &&
+        (cant != false) &&
+        (distr != false) &&
+        (ubMat != '') &&
+        (ubAsu != '') &&
+        (ubBie != '') &&
+        (tdiC != null && tdiC != " ") &&
+        (ndiC != null && ndiC != " ") &&
+        (nombC != "" && nombC != " ") &&
+        (apell1C != "" && apell1C != " ") &&
+        (apell2C != "" && apell2C != " ") &&
+        (descH != "" && descH != " ") &&
+        (resp != "" && resp != " ")
+      ) {
+        EnviarDatos();
       } else {
-        alert("Por favor, confirme que es humano...");
+        alert("faltan datos");
       }
+    } else {
+      alert("Por favor, confirme que es humano...");
+    }
   };
 
   //#region useStates de los select
@@ -1395,6 +1395,7 @@ const cargarDatosC = async (val, ub) => {
                     setnombC(nombreH)
                     setapell1C(nombreJ)
                     setRsocial(nombreH);
+                    setapell2C("NO INDICA");
                     ValidarinputNombC(nombreH, val)
                     console.log('Existen ambos')
                 }
