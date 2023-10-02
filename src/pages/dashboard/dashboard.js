@@ -103,7 +103,7 @@ function Dashboard() {
       // ... (otros filtros)
     );
 
-    setReportes(filt);
+    setReportes(filt || []);
   };
 
   // Manejadores de eventos para los cambios en los inputs de los filtros
