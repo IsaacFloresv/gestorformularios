@@ -23,27 +23,47 @@ const CompFormpres = () => {
 
   //Obtener el numero del ultimo
   const NextRegister = async () => {
-    let headersList = {
-      "Accept": "*/*",
-      "User-Agent": "Thunder Client (https://www.thunderclient.com)"
+    try {
+        let headersList = {
+            "Accept": "*/*",
+            "User-Agent": "Thunder Client (https://www.thunderclient.com)"
+        }
+
+        let response = await fetch("https://fwmback-production.up.railway.app/amp", {
+            method: "PUT",
+            headers: headersList
+        });
+
+        if (!response.ok) {
+            throw new Error('Ocurrió un error al realizar la solicitud.');
+        }
+
+        setAgente(cookies.get('info'))
+        let data = await response.text();
+        nReporte = data
+        const may = nReporte
+
+        console.log(data)
+        console.log(data)
+        setidNR(data)
+
+        setnRegistro(may)
+    } catch (error) {
+        console.error(error);
+        alert("Ocurrio un error, se muestra")
+        /*const confirmRetry = window.confirm(
+            'Ocurrió un error al realizar la solicitud. ¿Desea intentar de nuevo?'
+        );
+
+        if (confirmRetry) {
+            NextRegister(); // Intentar de nuevo llamando a la función
+        }*/
     }
-
-    let response = await fetch("https://fwmback-production.up.railway.app/amp", {
-      method: "PUT",
-      headers: headersList
-    });
+};
 
 
-    setAgente(cookies.get('info'))
-    let data = await response.text();
-    nReporte = data
-    const may = nReporte
-
-    console.log(data)
-    setidNR(data)
-
-    setnRegistro(may)
-    /*let may = await response.text();
+      /*Parte del codigo antiguo de NextRegister
+      let may = await response.text();
     let rmay = (may++)
     nreport = rmay
 
@@ -52,137 +72,13 @@ const CompFormpres = () => {
     console.log(nreport, data)*/
 
     //setnRegistro(may)
-  };
-
-  const EnviarDatos = async (v) => {
-    const fecha = new Date().toLocaleString();
-    setFchareg(fecha)
-    if (v === 1) {
-      console.log("EnviarDatos se llama de forma reciproca")          
-    }else{
-      alert("Se procede a guardar los datos");
-    }
-    
-    var nagente = cookies.get('info')
-    let headersList = {
-      Accept: "*/*",
-      //"User-Agent": "Thunder Client (https://www.thunderclient.com)",
-      "Content-Type": "application/json",
-    };
-
-    if (!nReporte) {
-      console.log("nReporte esta null")
-      console.log(nReporte)
-      NextRegister()      
-    } else {
-      let bodyContent = JSON.stringify({
-        id_report: nReporte,
-        fchareg: fchareg,
-        id_agente: nagente,
-        fchacomplet: fchacomplet,
-        status: eRegistro,
-        origen_r: oRegistro,
-        tel_origen: toRegistro,
-        usuario_s: userspe,
-        us_obser: usobser,
-        tdia: tdiA,
-        ndia: ndiA,
-        nomba: nombA,
-        apell1a: apell1A,
-        apell2a: apell2A,
-        email: email,
-        email2: email2,
-        tel: tel,
-        tel2: tel2,
-        provi: provi,
-        canto: canto,
-        distr: distr,
-        materia: ubMat,
-        asunto: ubAsu,
-        bien: ubBie,
-        razon_social: rsocial,
-        nombre_fantasia: nfantasy,
-        tdic: tdiC,
-        ndic: ndiC,
-        fchahech: fchaHech,
-        fchagar: fchaGar,
-        desch: descH,
-        respe: resp,
-        id_audio: idaudio,
-        id_correo: idcorreo,
-      });
-
-      console.log(bodyContent)
-      let reqOptions = {
-        url: "https://fwmback-production.up.railway.app/asepress",
-        method: "POST",
-        headers: headersList,
-        data: bodyContent,
-      }
-
-      let response = await axios.request(reqOptions);
-      if (response.data.status === 400 || response.data.message === 'Validation error') {
-        nReporte = ++nReporte
-        console.log(nReporte)  
-        console.log("no se guardo el dato.")
-        EnviarDatos(1)
-      } else {
-        console.log(response)
-        alert("Registro Creado Correctamente....");
-        NextRegister()
-        //window.location.reload()
-      }
-    }
-  };
-
-  //Validacion de formulario antes de enviar correo
-  const validarbtnSubmit = (e) => {
-    e.preventDefault();
-    NextRegister()
-    const NR = 1;
-    if (NR != null) {
-      if (
-        (telorigen != "" && telorigen != " ") &&
-        (agente != "" && agente != " ") &&
-        (usobser != "" && usobser != " ") &&
-        (ndiA != "" && ndiA != " ") &&
-        (nombA != "" && nombA != " ") &&
-        (apell1A != "" && apell1A != " ") &&
-        (apell2A != "" && apell2A != " ") &&
-        (email2 != "" && email2 != " ") &&
-        (email != "" && email != " ") &&
-        (tel != "" && tel != " ") &&
-        (tel2 != "" && tel2 != " ") &&
-        (fchaHech != "" && fchaHech != " ") &&
-        (fchaGar != "" && fchaGar != " ") &&
-        (prov != false) &&
-        (cant != false) &&
-        (distr != false) &&
-        (ubMat != '') &&
-        (ubAsu != '') &&
-        (ubBie != '') &&
-        (tdiC != null && tdiC != " ") &&
-        (ndiC != null && ndiC != " ") &&
-        (nombC != "" && nombC != " ") &&
-        (apell1C != "" && apell1C != " ") &&
-        (apell2C != "" && apell2C != " ") &&
-        (descH != "" && descH != " ") &&
-        (resp != "" && resp != " ")
-      ) {
-        EnviarDatos();
-      } else {
-        alert("faltan datos");
-      }
-    } else {
-      alert("Por favor, confirme que es humano...");
-    }
-  };
 
   //#region useStates de los select
   //useState de datos
   const [ prov, setProv ] = useState([]);
   const [ cant, setCant ] = useState([]);
   const [ dist, setDist ] = useState([]);
+
   useEffect(() => {
     getProvs()
     getMaterias()
@@ -360,6 +256,131 @@ const CompFormpres = () => {
   //#endregion
 
   //#region Validacion de inputs
+
+  const EnviarDatos = async (v) => {
+    let fecha = new Date().toLocaleString();
+    let fchareg = fecha;
+    setFchareg(fecha)
+
+    if (v === 1) {
+      console.log("EnviarDatos se llama de forma reciproca")          
+    }else{
+      alert("Se procede a guardar los datos");
+    }
+    
+    var nagente = cookies.get('info')
+    let headersList = {
+      Accept: "*/*",
+      //"User-Agent": "Thunder Client (https://www.thunderclient.com)",
+      "Content-Type": "application/json",
+    };
+
+    if (!nReporte) {
+      console.log("nReporte esta null")
+      console.log(nReporte)
+      NextRegister()      
+    } else {
+      let bodyContent = JSON.stringify({
+        id_report: ++nReporte,
+        fchareg: fchareg,
+        id_agente: nagente,
+        fchacomplet: fchacomplet,
+        status: eRegistro,
+        origen_r: oRegistro,
+        tel_origen: toRegistro,
+        usuario_s: userspe,
+        us_obser: usobser,
+        tdia: tdiA,
+        ndia: ndiA,
+        nomba: nombA,
+        apell1a: apell1A,
+        apell2a: apell2A,
+        email: email,
+        email2: email2,
+        tel: tel,
+        tel2: tel2,
+        provi: provi,
+        canto: canto,
+        distr: distr,
+        materia: ubMat,
+        asunto: ubAsu,
+        bien: ubBie,
+        razon_social: rsocial,
+        nombre_fantasia: nfantasy,
+        tdic: tdiC,
+        ndic: ndiC,
+        fchahech: fchaHech,
+        fchagar: fchaGar,
+        desch: descH,
+        respe: resp,
+        id_audio: idaudio,
+        id_correo: idcorreo,
+      });
+
+      console.log(bodyContent)
+      let reqOptions = {
+        url: "https://fwmback-production.up.railway.app/asepress",
+        method: "POST",
+        headers: headersList,
+        data: bodyContent,
+      }
+
+      let response = await axios.request(reqOptions);
+      if (response.data.status === 400 || response.data.message === 'Validation error') {
+        console.log(nReporte)  
+        console.log("no se guardo el dato.")
+        EnviarDatos(1)
+      } else {
+        console.log(response)
+        alert("Registro Creado Correctamente....");
+        NextRegister()
+        //window.location.reload()
+      }
+    }
+  };
+
+  //Validacion de formulario antes de enviar correo
+  const validarbtnSubmit = (e) => {
+    e.preventDefault();
+    NextRegister()
+    const NR = 1;
+    if (NR != null) {
+      if (
+        (telorigen != "" && telorigen != " ") &&
+        (agente != "" && agente != " ") &&
+        (usobser != "" && usobser != " ") &&
+        (ndiA != "" && ndiA != " ") &&
+        (nombA != "" && nombA != " ") &&
+        (apell1A != "" && apell1A != " ") &&
+        (apell2A != "" && apell2A != " ") &&
+        (email2 != "" && email2 != " ") &&
+        (email != "" && email != " ") &&
+        (tel != "" && tel != " ") &&
+        (tel2 != "" && tel2 != " ") &&
+        (fchaHech != "" && fchaHech != " ") &&
+        (fchaGar != "" && fchaGar != " ") &&
+        (prov != false) &&
+        (cant != false) &&
+        (distr != false) &&
+        (ubMat != '') &&
+        (ubAsu != '') &&
+        (ubBie != '') &&
+        (tdiC != null && tdiC != " ") &&
+        (ndiC != null && ndiC != " ") &&
+        (nombC != "" && nombC != " ") &&
+        (apell1C != "" && apell1C != " ") &&
+        (apell2C != "" && apell2C != " ") &&
+        (descH != "" && descH != " ") &&
+        (resp != "" && resp != " ")
+      ) {
+        EnviarDatos();
+      } else {
+        alert("faltan datos");
+      }
+    } else {
+      alert("Por favor, confirme que es humano...");
+    }
+  };
   function limpiardatosA() {
     setndiA('')
     setnombA("")
@@ -1038,8 +1059,6 @@ const ValidarinputResp = (val) => {
 
 //Validacion del campo inputCed del afectado
 const validarInputCedA = (val, ub) => {
-  const fecha = new Date().toLocaleString();
-  setFchareg(fecha)
   const valor = val;
   setndiA(valor);
   if (ub == 1) {
@@ -1172,46 +1191,75 @@ const validarInputCedC = (val, ub) => {
 
   //Mostrar todas las provincias
   const getProvs = async () => {
-    const res = await axios.get(URI + "prov/");
-    setProv(res.data);
-
-    //getCants();
+    try {
+      const res = await axios.get(URI + "prov/");
+      setProv(res.data);
+    } catch (error) {
+      console.error("Error al obtener los datos de provincia:", error);
+    }
   };
 
   //Mostrar los cantones por provincia
   const getCants = async (v) => {
-    const val = v?.target.value;
-    if (val != null) {
-      setdeshabCant(false);
-
-
-      let index = v.target.selectedIndex;
-      let ubprov = v.target.options[ index ].text;
-      setProvi(ubprov);
-      setidProv(val);
-      const res = await axios.get(URI + "cant/" + val);
-      setCant(res.data);
-    } else {
-      setubCant("0");
-      setubDist("0");
+    try {
+      const val = v?.target.value;
+      if (val != null) {
+        setdeshabCant(false);
+  
+        let index = v.target.selectedIndex;
+        let ubprov = v.target.options[index].text;
+        setProvi(ubprov);
+        setidProv(val);
+        const res = await axios.get(URI + "cant/" + val);
+        setCant(res.data);
+      } else {
+        setubCant("0");
+        setubDist("0");
+      }
+    } catch (error) {
+      console.error("Error al obtener los datos del cantón:", error);
+  
+      const shouldRetry = window.confirm(
+        "Ocurrió un error al obtener los datos del cantón. ¿Desea intentar de nuevo?"
+      );
+  
+      if (shouldRetry) {
+        // Llama la función nuevamente para reintentar.
+        getCants(v);
+      }
     }
   };
+  
 
   //Mostrar los distritos por canton
   const getDists = async (v) => {
-    const val = v?.target.value;
-    if (val != null) {
-      v === 0 ? setdeshabDist(true) : setdeshabDist(false);
-
-      let index = v.target.selectedIndex;
-      let ubcant = v.target.options[ index ].text;
-      setCanto(ubcant);
-      setidCant(val);
-      const res = await axios.get(URI + "dist/" + val);
-      setDist(res.data);
-      setdeshabMateria(false)
+    try {
+      const val = v?.target.value;
+      if (val != null) {
+        v === 0 ? setdeshabDist(true) : setdeshabDist(false);
+  
+        let index = v.target.selectedIndex;
+        let ubcant = v.target.options[index].text;
+        setCanto(ubcant);
+        setidCant(val);
+        const res = await axios.get(URI + "dist/" + val);
+        setDist(res.data);
+        setdeshabMateria(false);
+      }
+    } catch (error) {
+      console.error("Error al obtener los datos del distrito:", error);
+  
+      const shouldRetryDistrito = window.confirm(
+        "Ocurrió un error al obtener los datos del distrito. ¿Desea intentar de nuevo?"
+      );
+  
+      if (shouldRetryDistrito) {
+        // Llama la función nuevamente para reintentar.
+        getDists(v);
+      }
     }
   };
+  
 
   //Metodo para definir el distrito
   const defubdist = (v) => {
@@ -1226,30 +1274,49 @@ const validarInputCedC = (val, ub) => {
   };
 
   const getMaterias = async () => {
-    const res = await axios.get(URI + "mat/");
-    setMateria(res.data);
+    try {
+      const res = await axios.get(URI + "mat/");
+      setMateria(res.data);
+    } catch (error) {
+      console.error("Se ha producido un error al obtener las materias:", error);
+    }
   };
 
   //Mostrar los cantones por provincia
   const getAsuntConsultado = async (v) => {
-    const val = v?.target.value;
-
-    if (val != null) {
-      setdeshabAConsultado(false);
-
-      let index = v.target.selectedIndex;
-      let Materia = v.target.options[ index ].text;
-      setubMat(Materia);
-      setidMat(val);
-
-      const res = await axios.get(URI + "asu/" + val);
-      setAsunto(res.data);
-      //getBienes();
-    } else {
-      setubCant("0");
-      setubDist("0");
+    try {
+      const val = v?.target.value;
+  
+      if (val != null) {
+        setdeshabAConsultado(false);
+  
+        let index = v.target.selectedIndex;
+        let Materia = v.target.options[index].text;
+        setubMat(Materia);
+        setidMat(val);
+  
+        const res = await axios.get(URI + "asu/" + val);
+        setAsunto(res.data);
+        //getBienes();
+      } else {
+        setubCant("0");
+        setubDist("0");
+      }
+    } catch (error) {
+      console.error("Error al obtener los datos del asunto consultado:", error);
+  
+      const shouldRetryAsunto = window.confirm(
+        "Ocurrió un error al obtener los datos del asunto. ¿Desea intentar de nuevo?"
+      );
+  
+      if (shouldRetryAsunto) {
+        // Llama la función nuevamente para reintentar.
+        getAsuntConsultado(v);
+      }
     }
   };
+  
+  
 
   const defAsunto = async (v) => {
     const val = v?.target.value;
@@ -1263,10 +1330,15 @@ const validarInputCedC = (val, ub) => {
 
   //Mostrar los distritos por canton
   const getBienes = async (v) => {
-    const res = await axios.get(URI + "bie/");
-    setBien(res.data);
-    setdeshabBien(false);
+    try {
+      const res = await axios.get(URI + "bie/");
+      setBien(res.data);
+      setdeshabBien(false);
+    } catch (error) {
+      console.error("Se ha producido un error al obtener los bienes:", error);
+    }
   };
+  
 
   const defbien = (v) => {
     if (v.label != null) {
@@ -1280,44 +1352,64 @@ const validarInputCedC = (val, ub) => {
 
   //Solicitud a DB
   const cargarDatosP = async (val, ub) => {
-    const Ub = ub
-    console.log(val, Ub)
-    await fetch(URI + 'pers/' + val)
-        .then(resp => resp.json())
-        .then((data) => {
-            const Perso = data[ 0 ]
-            setPers(Perso)
-            console.log(Perso)
-            if ((ub == 1) && (selectNidA == 1)) {
-                const nombre = Perso?.nombre
-                setnombA(nombre)
-                setapell1A(Perso?.first_last_name)
-                setapell2A(Perso?.second_last_name)
-                ValidarinputNomb(nombre, val)
-                ValidarinputApp1(Perso?.first_last_name)
-                ValidarinputApp2(Perso?.second_last_name.trimEnd())
-            } else if ((ub == 2) && (selectNidC == 1)) {
-                const nombre = Perso?.nombre
-                setnombC(nombre)
-                setapell1C(Perso?.first_last_name)
-                setapell2C(Perso?.second_last_name)
-                ValidarinputNombC(nombre, val)
-                ValidarinputApp1C(Perso?.first_last_name)
-                ValidarinputApp2C(Perso?.second_last_name.trimEnd())
-            } else if ((ub == 1) && (selectNidA == 3)) {
-                cargarDatosC(val, Ub)
-            }
-        })
+    const Ub = ub;
+    console.log(val, Ub);
+
+    try {
+        const response = await fetch(URI + 'pers/' + val);
+        if (!response.ok) {
+            throw new Error('Ocurrió un error al obtener los datos de la cédula.');
+        }
+
+        const data = await response.json();
+        const Perso = data[0];
+        setPers(Perso);
+        console.log(Perso);
+
+        if ((ub == 1) && (selectNidA == 1)) {
+            const nombre = Perso?.nombre;
+            setnombA(nombre);
+            setapell1A(Perso?.first_last_name);
+            setapell2A(Perso?.second_last_name);
+            ValidarinputNomb(nombre, val);
+            ValidarinputApp1(Perso?.first_last_name);
+            ValidarinputApp2(Perso?.second_last_name.trimEnd());
+        } else if ((ub == 2) && (selectNidC == 1)) {
+            const nombre = Perso?.nombre;
+            setnombC(nombre);
+            setapell1C(Perso?.first_last_name);
+            setapell2C(Perso?.second_last_name);
+            ValidarinputNombC(nombre, val);
+            ValidarinputApp1C(Perso?.first_last_name);
+            ValidarinputApp2C(Perso?.second_last_name.trimEnd());
+        } else if ((ub == 1) && (selectNidA == 3)) {
+            cargarDatosC(val, Ub);
+        }
+    } catch (error) {
+        console.error(error);
+        const confirmRetryFisica = window.confirm(
+            'Ocurrió un error al obtener los datos de la cédula. ¿Desea intentar de nuevo?'
+        );
+
+        if (confirmRetryFisica) {
+            cargarDatosP(val, ub); // Intentar de nuevo llamando a la función
+        }
+    }
 }
+
 
 const cargarDatosC = async (val, ub) => {
     console.log('En cargardatosC')
-    await fetch(URI + 'comer/' + val)
-        .then(resp => resp.json())
-        .then((data) => {
-            const Comer = data[ 0 ]
-            setComer(Comer)
-            console.log(ub)
+    try {
+      const response = await fetch(URI + 'comer/' + val);
+      if (!response.ok) {
+          throw new Error('Ocurrió un error al obtener los datos de la cédula.');
+      }
+
+      const data = await response.json();
+      const Comer = data[0];
+      setComer(Comer);
+      console.log(ub);
             if ((ub == 1) && (selectNidA == 3)) {
               console.log('Primer if de comer')
                 if ((Comer?.fantasy_name === null || Comer?.fantasy_name === 'NULL' || Comer?.fantasy_name === 'NA' || Comer?.fantasy_name === 'N/A') && Comer?.business_name !== null) {
@@ -1403,8 +1495,17 @@ const cargarDatosC = async (val, ub) => {
             } else if ((ub == 2) && (selectNidC == 1)) {
                 cargarDatosP(val, ub)
             }
-        })
-}
+          } catch (error) {
+            console.error(error);
+            const confirmRetryJuridica = window.confirm(
+                'Ocurrió un error al obtener los datos de la cédula. ¿Desea intentar de nuevo?'
+            );
+    
+            if (confirmRetryJuridica) {
+                cargarDatosC(val, ub); // Intentar de nuevo llamando a la función
+            }
+        }
+    }
   //#endregion
 
   return (
