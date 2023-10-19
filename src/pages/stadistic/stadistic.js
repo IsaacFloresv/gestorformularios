@@ -3,13 +3,13 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import Cookies from "universal-cookie";
 
-import ReactHTMLTableToExcel from "../dashboard/ReactHTMLTableToExcel.jsx";
 
 import "./App.css";
 import BarChart from "./components/BarChart.js";
 import LineChart from "./components/LineChart.js";
 import PieChart from "./components/PieChart.js";
 import { UserData } from "./Data.js";
+import XLSX from "xlsx";
 
 const cookies = new Cookies();
 const meicimg = "logo_meic.jpg";
@@ -39,11 +39,11 @@ function Stadistic() {
   const [idBie, setidBie] = useState();
   const [agente, setAgente] = useState(cookies.get("info"));
   const [reportes, setReportes] = useState([]);
-  useEffect(() => {
+  /*useEffect(() => {
         getTotalReportes()
         //getMaterias()
     }, [])
-
+*/
   const [fini, setFini] = useState();
   const [top, setTop] = useState();
   const [fend, setFend] = useState();
@@ -55,6 +55,13 @@ function Stadistic() {
   const [destabla, setDesTabla] = useState("d-none");
   const [txtTop, setTxtTop] = useState("");
 
+  //Declaracion de variables para desaparecer opciones en elementos a evaluar
+  const [selectedOption1, setSelectedOption1] = useState("0");
+  const [selectedOption2, setSelectedOption2] = useState("0");
+  const [selectedOption3, setSelectedOption3] = useState("0");
+  const [materiaOption, setMateriaOption] = useState("0");
+  const [materiaOption2, setMateriaOption2] = useState("0");
+
   const CerrarSession = () => {
     const respuesta = confirm("¿Desea salir?");
     if (respuesta == true) {
@@ -65,9 +72,11 @@ function Stadistic() {
 
   const exportarCompleto = () => {
     if (fchFin === "X" || fchIni === "X") {
-    const respuesta = confirm("Se exportara la totalidad de los registros de la base de datos, esto es un archivo pesado por lo que tomara un poco mas de tiempo. ¿Desea Continuar?");
+      const respuesta = confirm(
+        "Se exportara la totalidad de los registros de la base de datos, esto es un archivo pesado por lo que tomara un poco mas de tiempo. ¿Desea Continuar?"
+      );
     }
-  }
+  };
 
   Array.prototype.unicos = function () {
     const unicos = [];
@@ -89,52 +98,15 @@ function Stadistic() {
   };
 
   const getTotalReportes = async () => {
-    const res = await axios.get(URI)
-    const report = res.data
-    
-    setReportes(report)
-    setDReportes(report)
-  }
+    const res = await axios.get(URI);
+    const report = res.data;
 
-  const getReportes = async () => {
-    let bodyContent
-    let headersList = {
-      Accept: "*/*",
-      //"User-Agent": "Thunder Client (https://www.thunderclient.com)",
-      "Content-Type": "application/json",
-    };
-
-    if (fchFin === "X" || fchIni === "X") {
-      bodyContent = JSON.stringify({
-        elemt: `${elme}`,
-        top: dato2,
-        opc: 1,
-      });
-    } else {
-      bodyContent = JSON.stringify({        
-        opc: 3,
-        fchaFin: `${fchFin}`,
-        fchaIni: `${fchIni}`,
-      });
-    }
-    
-
-    let reqOptions = {
-      url: "https://fwmback-production.up.railway.app/topelemt",
-      method: "PUT",
-      headers: headersList,
-      data: bodyContent,
-    };
-    console.log(bodyContent);
-    let res = await axios.request(reqOptions);
-    const report = res.data[0];
-
-    console.log(report)
     setReportes(report);
     setDReportes(report);
   };
 
   const contador = async () => {
+    console.log("estoy aqui");
     VerTabla();
     let bodyContent;
     let headersList = {
@@ -166,31 +138,80 @@ function Stadistic() {
       data: bodyContent,
     };
     console.log(bodyContent);
-    let response = await axios.request(reqOptions);
-    console.log(response.data[0]);
+    try {
+      const response = await axios.request(reqOptions);
+      console.log(response.data[0]);
 
-    setTop(response.data[0]);
+      setTop(response.data[0]);
 
-    setUserData({
-      labels: top?.map((data) => data.elemt),
-      datasets: [
+      setUserData((prevState) => ({
+        ...prevState,
+        labels: response.data[0]?.map((data) => data.elemt),
+        datasets: [
+          {
+            ...prevState.datasets[0],
+            data: response.data[0]?.map((data) => data.total),
+          },
+        ],
+      }));
+
+      //getTotalReportes();
+      getReportes();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getReportes = async () => {
+    let bodyContent;
+    let headersList = {
+      Accept: "*/*",
+      "Content-Type": "application/json",
+    };
+  
+    if (fchFin === "X" || fchIni === "X") {
+      bodyContent = JSON.stringify({
+        elemt: `${elme}`,
+        top: dato2,
+        opc: 1,
+      });
+    } else {
+      bodyContent = JSON.stringify({
+        opc: 3,
+        fchaFin: `${fchFin}`,
+        fchaIni: `${fchIni}`,
+      });
+    }
+  
+    let reqOptions = {
+      url: "https://fwmback-production.up.railway.app/topelemt",
+      method: "PUT",
+      headers: headersList,
+      data: bodyContent,
+    };
+  
+    try {
+      const res = await axios.request(reqOptions);
+      const report = res.data[0];
+  
+      // Filter and count occurrences of the selected "Categoría" within the "Materia" column
+      const selectedCategory = materiaOption;
+      const totalCount = report
+        .filter((item) => item.materia === selectedCategory)
+        .reduce((total, item) => total + item.total, 0);
+  
+      // Create a new array with only the selected "Categoría" and its count
+      const categoryReport = [
         {
-          label: `${title}`,
-          data: top?.map((data) => data.total),
-          backgroundColor: [
-            "rgba(75,192,192,1)",
-            "#ecf0f1",
-            "#50AF95",
-            "#f3ba2f",
-            "#2a71d0",
-          ],
-          borderColor: "black",
-          borderWidth: 2,
+          categoria: selectedCategory,
+          total: totalCount,
         },
-      ],
-    });
-
-    getReportes();
+      ];
+  
+      setDReportes(categoryReport);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const selectTop = (e) => {
@@ -213,7 +234,7 @@ function Stadistic() {
       setTxtTop("");
     }
     if (valor === 4) {
-      setDato2("") | setDeshabTxtTop("d-none");
+      setDato2("100000") | setDeshabTxtTop("d-none");
       setTxtTop("");
     }
     if (valor === 5) {
@@ -345,6 +366,11 @@ function Stadistic() {
           "#50AF95",
           "#f3ba2f",
           "#2a71d0",
+          "#5A64FE",
+          "#FE5A8C",
+          "#FE675A",
+          "#80FE5A",
+          "#B62323",
         ],
         borderColor: "black",
         borderWidth: 2,
@@ -766,7 +792,112 @@ function Stadistic() {
       }
     }
   };
+
+  const generarTabla = () => {
+    const tabla = [
+      ["Elemento", "Total"],
+      ...userData.labels.map((elemt) => [
+        elemt,
+        userData.datasets[0].data[userData.labels.indexOf(elemt)],
+      ]),
+    ];
+
+    setTabla(tabla);
+  };
+
+  const generarGrafico = () => {
+    const grafico = new Chart("grafico", {
+      type: graFic,
+      data: userData,
+    });
+
+    setGrafico(grafico);
+  };
+
+  //Funciones para desaparecer opciones en elementos a evaluar
+  const handleSelect1Change = (e) => {
+    const selectedValue = e.target.value;
+    setSelectedOption1(selectedValue);
+  };
+
+  const handleSelect2Change = (e) => {
+    const selectedValue2 = e.target.value;
+    setSelectedOption2(selectedValue2);
+  };
+
+  const handleSelect3Change = (e) => {
+    const selectedValue3 = e.target.value;
+    setSelectedOption3(selectedValue3);
+  };
+
+  const handleMateriaChange = (e) => {
+    const selectedValue = e.target.value;
+    setMateriaOption(selectedValue);
+  };
+
+  const handleMateria2Change = (e) => {
+    const selectedValue = e.target.value;
+    setMateriaOption2(selectedValue);
+  };
+
   //#endregion
+
+  /*const exportarDatosGrafico = () => {
+    // Obtén los datos del gráfico y de la tabla.
+    const datosGrafico = userData;
+    const datosTabla = top; // Ajusta esto según tus necesidades.
+  
+    // Combina los datos en un solo conjunto de datos.
+    const datosCombinados = datosTabla.map((dato, index) => ({
+      Elemento: dato.elemt,
+      Total: dato.total,
+      Grafico: datosGrafico.datasets[0].data[index], // Ajusta esto según tu estructura de datos de gráfico.
+    }));
+  
+    // Crea un libro de Excel.
+    const wb = XLSX.utils.book_new();
+  
+    // Convierte los datos combinados a una hoja de Excel.
+    const ws = XLSX.utils.json_to_sheet(datosCombinados);
+  
+    // Agrega la hoja al libro de Excel.
+    XLSX.utils.book_append_sheet(wb, ws, 'Datos Combinados');
+  
+    // Guarda el archivo Excel.
+    XLSX.writeFile(wb, 'datos_combinados.xlsx');
+  };
+*/
+const exportToExcel = () => {
+  // Obtener los datos de la tabla
+  const table = document.getElementById('RepoSoliPres');
+  const ws = XLSX.utils.table_to_sheet(table);
+
+  // Crear un libro de Excel
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Hoja1');
+
+  // Generar un archivo Excel
+  const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+
+  // Crear un blob a partir de los datos del archivo Excel
+  const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+  // Crear una URL de objeto para el blob
+  const url = URL.createObjectURL(blob);
+
+  // Crear un enlace para descargar el archivo
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'tabla.xlsx';
+  a.click();
+
+  // Liberar la URL de objeto
+  URL.revokeObjectURL(url);
+};
+
+
+
+  
 
   return (
     <>
@@ -779,9 +910,7 @@ function Stadistic() {
             height="55"
             className="d-flex justify-content-start"
           />
-          <p className="fs-2 fw-bolder text-center clrTitle">
-            Pagina Principal
-          </p>
+          <p className="fs-2 fw-bolder text-center clrTitle">ESTADISTICAS</p>
           <p className="mt-5 text-secondary d-flex flex-row-reverse">
             Agente: {agente}
           </p>
@@ -790,14 +919,16 @@ function Stadistic() {
             type="button"
             data-bs-toggle="offcanvas"
             data-bs-target="#offcanvasNavbar"
-            aria-controls="offcanvasNavbar">
+            aria-controls="offcanvasNavbar"
+          >
             <span className="navbar-toggler-icon"></span>
           </button>
           <div
             className="offcanvas offcanvas-end"
             tabindex="-1"
             id="offcanvasNavbar"
-            aria-labelledby="offcanvasNavbarLabel">
+            aria-labelledby="offcanvasNavbarLabel"
+          >
             <div className="offcanvas-header">
               <h5 className="offcanvas-title" id="offcanvasNavbarLabel">
                 Opciones
@@ -806,7 +937,8 @@ function Stadistic() {
                 type="button"
                 className="btn-close"
                 data-bs-dismiss="offcanvas"
-                aria-label="Close"></button>
+                aria-label="Close"
+              ></button>
             </div>
             <div className="offcanvas-body">
               <ul className="navbar-nav justify-content-end flex-grow-1 pe-3">
@@ -816,7 +948,8 @@ function Stadistic() {
                     id="btnenviar"
                     type="buttom"
                     className="nav-link"
-                    aria-current="page">
+                    aria-current="page"
+                  >
                     Inicio
                   </Link>
                 </li>
@@ -826,7 +959,8 @@ function Stadistic() {
                     id="btnenviar"
                     type="button"
                     className="nav-link"
-                    aria-current="page">
+                    aria-current="page"
+                  >
                     Formulario Solicitud de asesoria
                   </a>
                 </li>
@@ -837,7 +971,8 @@ function Stadistic() {
                     type="button"
                     className="nav-link"
                     onClick={() => CerrarSession()}
-                    aria-current="page">
+                    aria-current="page"
+                  >
                     Salir
                   </Link>
                 </li>
@@ -850,7 +985,7 @@ function Stadistic() {
       <br />
       <div className="row py-2">
         <h3>Definición de gráficos y tablas</h3>
-        <br />
+        <h1></h1>
         <div className="col-md-4">
           <label htmlFor="fcini" className="form-label">
             Fecha Inicial
@@ -900,7 +1035,7 @@ function Stadistic() {
             <option defaultValue="9">N. Ident. Usuario</option>
             <option defaultValue="10">N. Ident. Comerciante</option>
             <option defaultValue="11">Agente</option>
-            <option defaultValue="12">Linea de Origen</option>
+            <option defaultValue="12">Origen</option>
             <option defaultValue="13">Estado</option>
             <option defaultValue="14">Razon Social/Nombre Comerciante</option>
             <option defaultValue="15">Nombre Fantasía</option>
@@ -910,7 +1045,7 @@ function Stadistic() {
           </select>
         </div>
         <div className="col-md-4">
-          <label htmlFor="input_Top" className="form-label mx-2">
+          <label htmlFor="input_Top" className="form-label">
             Filtros Top
           </label>
 
@@ -918,16 +1053,15 @@ function Stadistic() {
             id="input_TID"
             className="form-select"
             name="tid"
-            onChange={(e) => selectTop(e)}>
+            onChange={(e) => selectTop(e)}
+          >
             <option value="0" selected="selected" disabled>
               Seleccione...
             </option>
             <option defaultValue="1">Top 10</option>
             <option defaultValue="2">Top 20</option>
             <option defaultValue="3">Top 30</option>
-            <option className="d-none" defaultValue="4">
-              Todos
-            </option>
+            <option defaultValue="4">Todos</option>
             <option defaultValue="5">Definir</option>
           </select>
         </div>
@@ -954,7 +1088,8 @@ function Stadistic() {
             className="form-select"
             onChange={(e) => obtGrafic(e)}
             name="tdg"
-            required>
+            required
+          >
             <option value="0" selected="selected" disabled>
               Seleccione...
             </option>
@@ -982,23 +1117,17 @@ function Stadistic() {
           </div>
           <div className="row mt-2">
             <p>Opciones para Exportar</p>
-            <div className="col-md-4 mt-2 text-wrap" onClick={(e) => exportarCompleto()}>
-              <ReactHTMLTableToExcel
-                id="test-table-xls-button"
-                className="btn btn-success"
-                table="TabletTotal"
-                filename="Reporte General"
-                sheet="Solicitud Presencial de Asesorias"
-                buttonText="Exportar datos a Excel"                
-              />
+            <div className="col-md-4 mt-2 text-wrap">
+            <button className="btn btn-success me-1" onClick={exportToExcel}>
+  Exportar a Excel
+</button>
             </div>
             <div className="d-none col-md-4 mt-2 text-wrap">
-              <button className="btn btn-success me-1">
-                Exportar a PDF
-              </button>
+              <button className="btn btn-success me-1">Exportar a PDF</button>
               <button
                 className="d-none btn btn-success"
-                onClick={() => contador()}>
+                onClick={() => contador()}
+              >
                 Exportar a CSV
               </button>
             </div>
@@ -1015,35 +1144,36 @@ function Stadistic() {
       <br />
       <br />
       <table id="TabletTotal">
-      <div className="container-fluid top-50">
-        <div className="row">
-          <div className="App fs-5">
-            <div id="Bar" className={deshaBar}>
-              <div style={{ width: 1000}}>
-                <BarChart chartData={userData} />
+        <div className="container-fluid top-50">
+          <div className="row">
+            <div className="App fs-5">
+              <div id="Bar" className={deshaBar}>
+                <div style={{ width: 1000 }}>
+                  <BarChart chartData={userData} />
+                </div>
               </div>
-            </div>
-            <div id="Line" className={deshaLine}>
-              <div style={{ width: 1000 }}>
-                <LineChart chartData={userData} />
+              <div id="Line" className={deshaLine}>
+                <div style={{ width: 1000 }}>
+                  <LineChart chartData={userData} />
+                </div>
               </div>
-            </div>
-            <div id="Pie" className={deshaPie}>
-              <div style={{ width: 1000 }}>
-                <PieChart chartData={userData} />
+              <div id="Pie" className={deshaPie}>
+                <div style={{ width: 1000 }}>
+                  <PieChart chartData={userData} />
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      <br />
-      <br />
-      <br />
-      
-        <div className={destabla}>
+        <br />
+        <br />
+        <br />
+
+        <div>
           <table
             id="RepoSoliPres"
-            className="table table-dark fs-5 table-striped caption-top badge text-nowrap table-bordered border-primary overflow-auto">
+            className="table table-light fs-5 table-striped caption-top badge text-nowrap border-primary overflow-auto"
+          >
             <caption>{title}</caption>
             <thead>
               <tr>
@@ -1070,12 +1200,14 @@ function Stadistic() {
               <div className="d-none container-fluid table-bordered">
                 <button
                   className="d-none btn btn-danger"
-                  onClick={() => ResetTable()}>
+                  onClick={() => ResetTable()}
+                >
                   Restrablecer Tabla
                 </button>
                 <table
                   id="RepoTotal"
-                  className="table table-dark table-striped badge text-nowrap table-bordered border-primary overflow-auto">
+                  className="table table-dark table-striped badge text-nowrap table-bordered border-primary overflow-auto"
+                >
                   <caption>{title}</caption>
                   <thead>
                     <tr>
@@ -1109,7 +1241,7 @@ function Stadistic() {
                       <th scope="col">Respuesta Enviada</th>
                     </tr>
                   </thead>
-                  <tbody>                    
+                  <tbody>
                     {reportes.map((reportes) => (
                       <tr key={reportes.id}>
                         <th scope="row">{reportes.id_report}</th>
