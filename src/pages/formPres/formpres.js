@@ -1327,7 +1327,7 @@ const CompFormpres = () => {
       setdeshabBien(false);
     } catch (error) {
       console.error("Se ha producido un error al obtener los bienes:", error);
-      getBienes();
+      getBienes(v);
     }
   };
 
