@@ -50,16 +50,10 @@ const CompFormpres = () => {
         setnRegistro(may)
     } catch (error) {
         console.error(error);
-        const confirmRetry = window.confirm(
-            'Ocurrió un error al realizar la solicitud. ¿Desea intentar de nuevo?'
-        );
-
-        if (confirmRetry) {
-            NextRegister(); // Intentar de nuevo llamando a la función
-            getProvs()
-            getMaterias()
-            getBienes()
-        }
+        NextRegister();
+        getProvs()
+        getMaterias()
+        getBienes()
     }
 };
 
@@ -1222,15 +1216,7 @@ const validarInputCedC = (val, ub) => {
       }
     } catch (error) {
       console.error("Error al obtener los datos del cantón:", error);
-  
-      const shouldRetry = window.confirm(
-        "Ocurrió un error al obtener los datos del cantón. ¿Desea intentar de nuevo?"
-      );
-  
-      if (shouldRetry) {
-        // Llama la función nuevamente para reintentar.
-        getCants(v);
-      }
+      getCants(v);
     }
   };
   
