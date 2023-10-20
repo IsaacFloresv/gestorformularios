@@ -50,14 +50,13 @@ const CompFormpres = () => {
         setnRegistro(may)
     } catch (error) {
         console.error(error);
-        alert("Ocurrio un error, se muestra")
-        /*const confirmRetry = window.confirm(
+        const confirmRetry = window.confirm(
             'Ocurrió un error al realizar la solicitud. ¿Desea intentar de nuevo?'
         );
 
         if (confirmRetry) {
             NextRegister(); // Intentar de nuevo llamando a la función
-        }*/
+        }
     }
 };
 
