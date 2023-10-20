@@ -56,6 +56,9 @@ const CompFormpres = () => {
 
         if (confirmRetry) {
             NextRegister(); // Intentar de nuevo llamando a la función
+            getProvs()
+            getMaterias()
+            getBienes()
         }
     }
 };
