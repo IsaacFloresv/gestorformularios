@@ -358,6 +358,7 @@ function Dashboard() {
       reporte["Nombre Fantasía"] = reporte.nombre_fantasia;
       reporte["Descripción del caso"] = reporte.desch;
       reporte["Respuesta Enviada"] = reporte.respe;
+      reporte["ID Audio"] = reporte.id_audio;
 
       // Eliminacion de las columnas originales
       delete reporte.id_report;
