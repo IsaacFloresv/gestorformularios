@@ -210,7 +210,6 @@ const CompFormpres = () => {
 
   //useState para validar campos
   const [dehabilSubmit, setdehabilSubmit] = useState(true);
-  const [camposDeshabilitados, setCamposDeshabilitados] = useState(false);
   const [lblinputName, setlblinputName] = useState("Nombre");
   const [fbNameA, setfbNameA] = useState("Por favor, ingrese su nombre.");
   const [fbNameC, setfbNameC] = useState(
@@ -327,6 +326,8 @@ const CompFormpres = () => {
         console.log(response);
         alert("Registro Creado Correctamente....");
         NextRegister();
+        window.location.reload();
+        window.scrollTo(0, 0);
       }
     }
   };
@@ -386,7 +387,6 @@ const CompFormpres = () => {
         resp != " "
       ) {
         setdehabilSubmit(true);
-        desactivarCampos();
         EnviarDatos();
       } else {
         alert("faltan datos");
@@ -1343,206 +1343,177 @@ const CompFormpres = () => {
 
   //Solicitud a DB
   const cargarDatosP = async (val, ub) => {
+    const Ub = ub;
+    console.log(val, Ub);
+
     try {
-      const Ub = ub;
-      console.log(val, Ub);
-      await fetch(URI + "pers/" + val)
-        .then((resp) => resp.json())
-        .then((data) => {
-          const Perso = data[0];
-          setPers(Perso);
-          console.log(Perso);
-          if (ub == 1 && selectNidA == 1) {
-            const nombre = Perso?.nombre;
-            setnombA(nombre);
-            setapell1A(Perso?.first_last_name);
-            setapell2A(Perso?.second_last_name);
-            ValidarinputNomb(nombre, val);
-            ValidarinputApp1(Perso?.first_last_name);
-            ValidarinputApp2(Perso?.second_last_name.trimEnd());
-          } else if (ub == 2 && selectNidC == 1) {
-            const nombre = Perso?.nombre;
-            setnombC(nombre);
-            setapell1C(Perso?.first_last_name);
-            setapell2C(Perso?.second_last_name);
-            ValidarinputNombC(nombre, val);
-            ValidarinputApp1C(Perso?.first_last_name);
-            ValidarinputApp2C(Perso?.second_last_name.trimEnd());
-          } else if (ub == 1 && selectNidA == 3) {
-            cargarDatosC(val, Ub);
-          }
-        });
+      const response = await fetch(URI + "pers/" + val);
+      if (!response.ok) {
+        throw new Error("Ocurrió un error al obtener los datos de la cédula.");
+      }
+
+      const data = await response.json();
+      const Perso = data[0];
+      setPers(Perso);
+      console.log(Perso);
+
+      if (ub == 1 && selectNidA == 1) {
+        const nombre = Perso?.nombre;
+        setnombA(nombre);
+        setapell1A(Perso?.first_last_name);
+        setapell2A(Perso?.second_last_name);
+        ValidarinputNomb(nombre, val);
+        ValidarinputApp1(Perso?.first_last_name);
+        ValidarinputApp2(Perso?.second_last_name.trimEnd());
+      } else if (ub == 2 && selectNidC == 1) {
+        const nombre = Perso?.nombre;
+        setnombC(nombre);
+        setapell1C(Perso?.first_last_name);
+        setapell2C(Perso?.second_last_name);
+        ValidarinputNombC(nombre, val);
+        ValidarinputApp1C(Perso?.first_last_name);
+        ValidarinputApp2C(Perso?.second_last_name.trimEnd());
+      } else if (ub == 1 && selectNidA == 3) {
+        cargarDatosC(val, Ub);
+      }
     } catch (error) {
-      // Manejo de la excepción
-      console.error("Error en cargarDatosP:", error);
-      // Llama a la función nuevamente
+      console.error(error);
       cargarDatosP(val, ub);
     }
   };
 
   const cargarDatosC = async (val, ub) => {
+    console.log("En cargardatosC");
     try {
-      console.log("En cargardatosC");
-      await fetch(URI + "comer/" + val)
-        .then((resp) => resp.json())
-        .then((data) => {
-          const Comer = data[0];
-          setComer(Comer);
-          console.log(ub);
-          if (ub == 1 && selectNidA == 3) {
-            console.log("Primer if de comer");
-            if (
-              (Comer?.fantasy_name === null ||
-                Comer?.fantasy_name === "NULL" ||
-                Comer?.fantasy_name === "NA" ||
-                Comer?.fantasy_name === "N/A") &&
-              Comer?.business_name !== null
-            ) {
-              setShowCompanyNameA(true);
-              const nombreA = Comer?.business_name;
-              setnombA(nombreA);
-              ValidarinputNomb(nombreA, val);
-              setlblinputName("Nombre de Empresa o institucion");
-              setinvisibleAp1("d-block col-md-4");
-              setlblinputName("Nombre de Empresa o institucion");
-              setlblapell1A("Nombre de Fantasía (Opcional)");
-              setapell1A("NO INDICA");
-              setapell2A("NO INDICA");
-              console.log("si no hay nombre de fantasia");
-            } else if (
-              Comer?.fantasy_name == "NULL" ||
-              Comer?.fantasy_name == null ||
-              Comer?.fantasy_name == "NA" ||
-              (Comer?.fantasy_name == "N/A" && Comer?.business_name == null)
-            ) {
-              setShowCompanyNameA(false);
-              const nombreB = "NO INDICA";
-              setinvisibleAp1("d-block col-md-4");
-              setlblinputName("Nombre de Empresa o institucion");
-              setlblapell1A("Nombre de Fantasía (Opcional)");
-              setnombA(nombreB);
-              setapell1A("NO INDICA");
-              setapell2A("NO INDICA");
-              ValidarinputNomb(nombreB, val);
-              console.log("No hay nombre fantasia ni institucion");
-            } else if (
-              Comer?.fantasy_name != "NULL" ||
-              Comer?.fantasy_name != null ||
-              Comer?.fantasy_name != "NA" ||
-              Comer?.fantasy_name != "N/A"
-            ) {
-              setShowCompanyNameA(true);
-              const nombreM = Comer?.business_name;
-              const nombreN = Comer?.fantasy_name;
-              setinvisibleAp1("d-block col-md-4");
-              setlblinputName("Nombre de Empresa o institucion");
-              setlblapell1A("Nombre de Fantasía (Opcional)");
-              setnombA(nombreM);
-              setapell1A(nombreN);
-              setapell2A("NO INDICA");
-              ValidarinputNomb(nombreM, val);
-              console.log("Existen ambos");
-            }
-          } else if (ub == 2 && selectNidC == 3) {
-            console.log("segundo if de comer");
-            if (
-              (Comer?.fantasy_name === null ||
-                Comer?.fantasy_name === "NULL" ||
-                Comer?.fantasy_name === "NA" ||
-                Comer?.fantasy_name === "N/A") &&
-              Comer?.business_name !== null
-            ) {
-              setShowCompanyNameC(true);
-              const nombreC = Comer?.business_name;
-              setnombC(nombreC);
-              ValidarinputNombC(nombreC, val);
-              setlblinputNameC("Nombre de Empresa o institucion");
-              setinvisibleAp1C("d-block col-md-4");
-              setlblinputNameC("Nombre de Empresa o institucion");
-              setlblapell1C("Nombre de Fantasía (Opcional)");
-              setapell1C("NO INDICA");
-              setapell2C("NO INDICA");
-              setRsocial(nombreC);
-              console.log("si no hay nombre de fantasia");
-            } else if (
-              (Comer?.fantasy_name == "NULL" ||
-                Comer?.fantasy_name == null ||
-                Comer?.fantasy_name == "NA" ||
-                Comer?.fantasy_name == "N/A") &&
-              Comer?.business_name == null
-            ) {
-              setShowCompanyNameC(false);
-              const nombreE = "NO INDICA";
-              setinvisibleAp1C("d-block col-md-5");
-              setlblinputNameC("Nombre de Empresa o institucion");
-              setlblapell1C("Nombre de Fantasía (Opcional)");
-              setnombC(nombreE);
-              setRsocial(nombreE);
-              setapell1C("NO INDICA");
-              setapell2C("NO INDICA");
-              ValidarinputNombC(nombreE, val);
-              console.log("No hay nombre fantasia ni institucion");
-            } else if (
-              Comer?.fantasy_name != "NULL" ||
-              Comer?.fantasy_name != null ||
-              Comer?.fantasy_name != "NA" ||
-              Comer?.fantasy_name != "N/A"
-            ) {
-              setShowCompanyNameC(true);
-              const nombreH = Comer?.business_name;
-              const nombreJ = Comer?.fantasy_name;
-              setinvisibleAp1C("d-block col-md-4");
-              setlblinputNameC("Nombre de Empresa o institucion");
-              setlblapell1C("Nombre de Fantasía (Opcional)");
-              setnombC(nombreH);
-              setapell1C(nombreJ);
-              setRsocial(nombreH);
-              setapell2C("NO INDICA");
-              ValidarinputNombC(nombreH, val);
-              console.log("Existen ambos");
-            }
-          } else if (ub == 2 && selectNidC == 1) {
-            cargarDatosP(val, ub);
-          }
-        });
+      const response = await fetch(URI + "comer/" + val);
+      if (!response.ok) {
+        throw new Error("Ocurrió un error al obtener los datos de la cédula.");
+      }
+
+      const data = await response.json();
+      const Comer = data[0];
+      setComer(Comer);
+      console.log(ub);
+      if (ub == 1 && selectNidA == 3) {
+        console.log("Primer if de comer");
+        if (
+          (Comer?.fantasy_name === null ||
+            Comer?.fantasy_name === "NULL" ||
+            Comer?.fantasy_name === "NA" ||
+            Comer?.fantasy_name === "N/A") &&
+          Comer?.business_name !== null
+        ) {
+          setShowCompanyNameA(true);
+          const nombreA = Comer?.business_name;
+          setnombA(nombreA);
+          ValidarinputNomb(nombreA, val);
+          setlblinputName("Nombre de Empresa o institucion");
+          setinvisibleAp1("d-block col-md-4");
+          setlblinputName("Nombre de Empresa o institucion");
+          setlblapell1A("Nombre de Fantasía (Opcional)");
+          setapell1A("NO INDICA");
+          setapell2A("NO INDICA");
+          console.log("si no hay nombre de fantasia");
+        } else if (
+          Comer?.fantasy_name == "NULL" ||
+          Comer?.fantasy_name == null ||
+          Comer?.fantasy_name == "NA" ||
+          (Comer?.fantasy_name == "N/A" && Comer?.business_name == null)
+        ) {
+          setShowCompanyNameA(false);
+          const nombreB = "NO INDICA";
+          setinvisibleAp1("d-block col-md-4");
+          setlblinputName("Nombre de Empresa o institucion");
+          setlblapell1A("Nombre de Fantasía (Opcional)");
+          setnombA(nombreB);
+          setapell1A("NO INDICA");
+          setapell2A("NO INDICA");
+          ValidarinputNomb(nombreB, val);
+          console.log("No hay nombre fantasia ni institucion");
+        } else if (
+          Comer?.fantasy_name != "NULL" ||
+          Comer?.fantasy_name != null ||
+          Comer?.fantasy_name != "NA" ||
+          Comer?.fantasy_name != "N/A"
+        ) {
+          setShowCompanyNameA(true);
+          const nombreM = Comer?.business_name;
+          const nombreN = Comer?.fantasy_name;
+          setinvisibleAp1("d-block col-md-4");
+          setlblinputName("Nombre de Empresa o institucion");
+          setlblapell1A("Nombre de Fantasía (Opcional)");
+          setnombA(nombreM);
+          setapell1A(nombreN);
+          setapell2A("NO INDICA");
+          ValidarinputNomb(nombreM, val);
+          console.log("Existen ambos");
+        }
+      } else if (ub == 2 && selectNidC == 3) {
+        console.log("segundo if de comer");
+        if (
+          (Comer?.fantasy_name === null ||
+            Comer?.fantasy_name === "NULL" ||
+            Comer?.fantasy_name === "NA" ||
+            Comer?.fantasy_name === "N/A") &&
+          Comer?.business_name !== null
+        ) {
+          setShowCompanyNameC(true);
+          const nombreC = Comer?.business_name;
+          setnombC(nombreC);
+          ValidarinputNombC(nombreC, val);
+          setlblinputNameC("Nombre de Empresa o institucion");
+          setinvisibleAp1C("d-block col-md-4");
+          setlblinputNameC("Nombre de Empresa o institucion");
+          setlblapell1C("Nombre de Fantasía (Opcional)");
+          setapell1C("NO INDICA");
+          setapell2C("NO INDICA");
+          setRsocial(nombreC);
+          console.log("si no hay nombre de fantasia");
+        } else if (
+          (Comer?.fantasy_name == "NULL" ||
+            Comer?.fantasy_name == null ||
+            Comer?.fantasy_name == "NA" ||
+            Comer?.fantasy_name == "N/A") &&
+          Comer?.business_name == null
+        ) {
+          setShowCompanyNameC(false);
+          const nombreE = "NO INDICA";
+          setinvisibleAp1C("d-block col-md-5");
+          setlblinputNameC("Nombre de Empresa o institucion");
+          setlblapell1C("Nombre de Fantasía (Opcional)");
+          setnombC(nombreE);
+          setRsocial(nombreE);
+          setapell1C("NO INDICA");
+          setapell2C("NO INDICA");
+          ValidarinputNombC(nombreE, val);
+          console.log("No hay nombre fantasia ni institucion");
+        } else if (
+          Comer?.fantasy_name != "NULL" ||
+          Comer?.fantasy_name != null ||
+          Comer?.fantasy_name != "NA" ||
+          Comer?.fantasy_name != "N/A"
+        ) {
+          setShowCompanyNameC(true);
+          const nombreH = Comer?.business_name;
+          const nombreJ = Comer?.fantasy_name;
+          setinvisibleAp1C("d-block col-md-4");
+          setlblinputNameC("Nombre de Empresa o institucion");
+          setlblapell1C("Nombre de Fantasía (Opcional)");
+          setnombC(nombreH);
+          setapell1C(nombreJ);
+          setRsocial(nombreH);
+          setapell2C("NO INDICA");
+          ValidarinputNombC(nombreH, val);
+          console.log("Existen ambos");
+        }
+      } else if (ub == 2 && selectNidC == 1) {
+        cargarDatosP(val, ub);
+      }
     } catch (error) {
-      // Manejo de la excepción
-      console.error("Error en cargarDatosC:", error);
-      // Llama a la función nuevamente
+      console.error(error);
       cargarDatosC(val, ub);
     }
   };
-
-  /*
-  document.addEventListener("DOMContentLoaded", function() {
-    // Agrega un manejador de clic al botón "Guardar Registro"
-    const btnGuardarRegistro = document.getElementById("btnenviar");
-    btnGuardarRegistro.addEventListener("click", desactivarCampos);
-    
-    function desactivarCampos() {
-      // Selecciona todos los elementos con la clase "campo-desactivable"
-      const camposDesactivables = document.querySelectorAll(".campo-desactivable");
-      
-      // Desactiva cada campo
-      camposDesactivables.forEach(function(campo) {
-        campo.disabled = true;
-      });
-      
-      // Desvincula el evento de clic del botón para evitar futuras acciones
-      btnGuardarRegistro.removeEventListener("click", desactivarCampos);
-    }
-  });*/
-
-  function desactivarCampos() {
-    // Obtén todos los elementos de entrada, textarea y select
-    var elementos = document.querySelectorAll("input, textarea, select");
-
-    // Recorre todos los elementos y desactívalos
-    elementos.forEach(function (elemento) {
-      elemento.disabled = true;
-    });
-  }
-
   //#endregion
 
   return (
