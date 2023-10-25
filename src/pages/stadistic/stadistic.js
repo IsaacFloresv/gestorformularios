@@ -1184,13 +1184,13 @@ function Stadistic() {
               </tr>
             </thead>
             <tbody>
-              {top?.map((dato) => (
-                <tr key={dato.elemt}>
-                  <th scope="row">{dato.elemt}</th>
-                  <td>{dato.total}</td>
-                </tr>
-              ))}
-            </tbody>
+  {top?.map((dato) => (
+    <tr key={dato.elemt}>
+      <th scope="row">{dato.elemt}</th>
+      <td style={{ textAlign: 'center', fontSize: '20px', fontWeight: 'bold' }}>{dato.total}</td>
+    </tr>
+  ))}
+</tbody>
           </table>
         </div>
         <br />
