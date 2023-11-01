@@ -49,21 +49,40 @@ function Login() {
          data: bodyContent,
        }
        
-       try{
-        let response = await axios.request(reqOptions)
-          if(response.statusText != "Forbidden" ){
-            const {resp, Agente} = response.data
-            cookies.set('token', resp)
-            cookies.set('info', Agente)
-            navigate('/home')
-            //window.location = '/formpres'
-          }else{
-            alert('El usuario y/o la contraseña no son correctos')
-          }
-       }catch(error){
-        console.log(error)
-        alert('El usuario y/o la contraseña no son correctos')
-       }
+       try {
+        let response = await axios.request(reqOptions);
+        if (response.statusText != "Forbidden") {
+          const { resp, Agente } = response.data;
+          cookies.set('token', resp);
+          cookies.set('info', Agente);
+          navigate('/home');
+        } else {
+          // Mostrar mensaje de error personalizado en el elemento HTML
+          const errorMessage = document.getElementById('error-message');
+          errorMessage.textContent = 'El usuario y/o la contraseña no son correctos.';
+          errorMessage.style.color = 'red';
+          errorMessage.style.fontWeight = 'bold';
+          errorMessage.style.backgroundColor = '#ffe6e6';  // Fondo rosa claro
+          errorMessage.style.border = '1px solid #ff9999'; // Borde rojo claro
+          errorMessage.style.padding = '10px';
+          errorMessage.style.borderRadius = '5px';
+          errorMessage.style['margin-top'] = '20px';
+          errorMessage.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)'; // Sombra suave
+        }
+      } catch (error) {
+        console.log(error);
+        // Mostrar mensaje de error personalizado en el elemento HTML
+        const errorMessage = document.getElementById('error-message');
+        errorMessage.textContent = 'El usuario y/o la contraseña no son correctos.';
+        errorMessage.style.color = 'red';
+        errorMessage.style.fontWeight = 'bold';
+        errorMessage.style.backgroundColor = '#ffe6e6';  // Fondo rosa claro
+        errorMessage.style.border = '1px solid #ff9999'; // Borde rojo claro
+        errorMessage.style.padding = '10px';
+        errorMessage.style.borderRadius = '5px';
+        errorMessage.style['margin-top'] = '20px';
+        errorMessage.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)'; // Sombra suave
+      }
        
       
     }
@@ -87,6 +106,8 @@ function Login() {
           </div>
 
           <button className="w-100 btn btn-lg btn-primary" type="submit" onClick={(e)=>LoginCheck(e)}>Ingresar</button>
+          
+          <div id="error-message"></div>
 
         </form>
         </div>
