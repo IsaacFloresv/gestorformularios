@@ -142,19 +142,22 @@ function Dashboard() {
   };
 
   //Funciones actualizadores de select
-  const obtencionFiltroAgente = (report) => {
-    // Obtén la lista de agentes únicos desde tus datos
-    const agentOptions = [
-      ...new Set(report.map((reporte) => reporte.id_agente)),
-    ].map((agente) => ({
+const obtencionFiltroAgente = (report) => {
+  // Obtén la lista de agentes únicos desde tus datos
+  const agentOptions = [
+    ...new Set(report.map((reporte) => reporte.id_agente)),
+  ]
+    .map((agente) => ({
       value: agente,
       label: agente,
-    }));
-    // Ordena la lista de agentes en orden alfabético
-    agentOptions.sort((a, b) => a.label.localeCompare(b.label));
+    }))
+    .filter((agente) => agente.label !== null); // Filtrar elementos con label nulo
+    
+  // Ordena la lista de agentes en orden alfabético
+  agentOptions.sort((a, b) => (a.label || '').localeCompare(b.label || ''));
 
-    setAgentOptions(agentOptions);
-  };
+  setAgentOptions(agentOptions);
+};
 
   const obtencionFiltroStatus = (report) => {
     // Obtén la lista de status únicos desde tus datos
