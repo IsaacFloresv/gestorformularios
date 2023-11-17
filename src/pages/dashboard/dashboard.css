@@ -310,3 +310,8 @@ margin-right: 10px;
   background-color: #228b3a;
   border-color: #228b3a;
 }
+
+.custom-select {
+  margin-left: 10px; /* Ajusta el margen izquierdo */
+  width: 12%;
+}
