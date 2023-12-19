@@ -613,7 +613,7 @@ const obtencionFiltroAgente = (report) => {
       reporte["Respuesta Enviada"] = reporte.respe;
       reporte["ID Audio"] = reporte.id_audio;
 
-      // Eliminacion de las columnas originales
+            // Eliminacion de las columnas originales
       delete reporte.id_report;
       delete reporte.id_agente;
       delete reporte.fchareg;
@@ -1425,7 +1425,7 @@ const obtencionFiltroAgente = (report) => {
             </tr>
             {reportes.map((dreportes) => (
               <tr key={dreportes.id}>
-                <th className="fixed-width-select" scope="row">{dreportes.id_report}</th>
+                <th className="fixed-width-select" scope="row"><a href={`/edit?id=${dreportes.id}`}>{dreportes.id_report}</a></th>
                 <td class="red-text">{dreportes.id_agente}</td>
                 <td>{dreportes.fchareg}</td>
                 <td>{dreportes.status}</td>
