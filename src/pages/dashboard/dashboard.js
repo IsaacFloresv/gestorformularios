@@ -143,22 +143,62 @@ function Dashboard() {
   };
 
   //Funciones actualizadores de select
-const obtencionFiltroAgente = (report) => {
-  // Obtén la lista de agentes únicos desde tus datos
-  const agentOptions = [
-    ...new Set(report.map((reporte) => reporte.id_agente)),
-  ]
-    .map((agente) => ({
-      value: agente,
-      label: agente,
-    }))
-    .filter((agente) => agente.label !== null); // Filtrar elementos con label nulo
+  const obtencionFiltroAgente = (report, selectedOption) => {
+    const agentOptions = [
+      ...new Set(report.map((reporte) => reporte.id_agente)),
+    ]
+      .map((agente) => ({
+        value: agente,
+        label: agente,
+      }))
+      .filter((agente) => agente.label !== null);
+  
+    agentOptions.sort((a, b) => (a.label || '').localeCompare(b.label || ''));
+  
+    let optionsWithTop = [
+      { value: 'top3', label: 'Top 3' },
+      { value: 'top5', label: 'Top 5' },
+      { value: 'top7', label: 'Top 7' },
+      { value: 'top10', label: 'Top 10' },
+      ...agentOptions,
+    ];
+  
+    if (selectedOption === 'top3' || selectedOption === 'top5' || selectedOption === 'top7' || selectedOption === 'top10') {
+      const topAgents = getTopAgents(report, selectedOption); // Obtener los principales agentes según la opción seleccionada
+      optionsWithTop = optionsWithTop.filter((option) => {
+        return option.value === selectedOption || topAgents.includes(option.value);
+      });
+    }
+  
+    // Moving selected top option to the end
+    const selectedOptionIndex = optionsWithTop.findIndex(option => option.value === selectedOption);
+    if (selectedOptionIndex !== -1) {
+      const selectedOptionItem = optionsWithTop.splice(selectedOptionIndex, 1);
+      optionsWithTop = [...optionsWithTop, ...selectedOptionItem];
+    }
+  
+    setAgentOptions(optionsWithTop);
+  };
+  
+  
+  const getTopAgents = (report, selectedOption) => {
+    const topCount = {
+      'top3': 3,
+      'top5': 5,
+      'top7': 7,
+      'top10': 10,
+    };
     
-  // Ordena la lista de agentes en orden alfabético
-  agentOptions.sort((a, b) => (a.label || '').localeCompare(b.label || ''));
-
-  setAgentOptions(agentOptions);
-};
+    const agentCount = report.reduce((acc, curr) => {
+      acc[curr.id_agente] = (acc[curr.id_agente] || 0) + 1;
+      return acc;
+    }, {});
+  
+    const topAgents = Object.keys(agentCount).sort((a, b) => agentCount[b] - agentCount[a]).slice(0, topCount[selectedOption]);
+  
+    return topAgents;
+  };
+  
 
   const obtencionFiltroStatus = (report) => {
     // Obtén la lista de status únicos desde tus datos
@@ -202,88 +242,347 @@ const obtencionFiltroAgente = (report) => {
     setTdiaOptions(tdiaOptions);
   };
 
-  const obtencionFiltroProvi = (report) => {
-    // Obtén la lista de status únicos desde tus datos
+  const obtencionFiltroProvi = (report, selectedOption) => {
+    // Obtén la lista de provincias únicas desde tus datos
     const proviOptions = [
       ...new Set(report.map((reporte) => reporte.provi)),
     ].map((provi) => ({
       value: provi,
       label: provi,
     }));
-    // Ordena la lista de status en orden alfabético
+    // Ordena la lista de provincias en orden alfabético
     proviOptions.sort((a, b) => a.label.localeCompare(b.label));
-
-    setProviOptions(proviOptions);
+  
+    let optionsWithTop = [
+      { value: 'top3', label: 'Top 3' },
+      { value: 'top5', label: 'Top 5' },
+      { value: 'top7', label: 'Top 7' },
+      { value: 'top10', label: 'Top 10' },
+      ...proviOptions,
+    ];
+  
+    if (selectedOption === 'top3' || selectedOption === 'top5' || selectedOption === 'top7' || selectedOption === 'top10') {
+      const topProvi = getTopProvi(report, selectedOption); // Obtener las principales provincias según la opción seleccionada
+      optionsWithTop = optionsWithTop.filter((option) => {
+        return option.value === selectedOption || topProvi.includes(option.value);
+      });
+    }
+  
+    // Moving selected top option to the end
+    const selectedOptionIndex = optionsWithTop.findIndex(option => option.value === selectedOption);
+    if (selectedOptionIndex !== -1) {
+      const selectedOptionItem = optionsWithTop.splice(selectedOptionIndex, 1);
+      optionsWithTop = [...optionsWithTop, ...selectedOptionItem];
+    }
+  
+    setProviOptions(optionsWithTop);
   };
+  
+  const getTopProvi = (report, selectedOption) => {
+    const topCount = {
+      'top3': 3,
+      'top5': 5,
+      'top7': 7,
+      'top10': 10,
+    };
+    
+    const proviCount = report.reduce((acc, curr) => {
+      acc[curr.provi] = (acc[curr.provi] || 0) + 1;
+      return acc;
+    }, {});
+  
+    const topProvi = Object.keys(proviCount).sort((a, b) => proviCount[b] - proviCount[a]).slice(0, topCount[selectedOption]);
+  
+    return topProvi;
+  };
+  
 
-  const obtencionFiltroCanto = (report) => {
-    // Obtén la lista de status únicos desde tus datos
+  const obtencionFiltroCanto = (report, selectedOption) => {
+    // Obtén la lista de cantidades únicas desde tus datos
     const cantoOptions = [
       ...new Set(report.map((reporte) => reporte.canto)),
     ].map((canto) => ({
       value: canto,
       label: canto,
     }));
-    // Ordena la lista de status en orden alfabético
+    // Ordena la lista de cantidades en orden alfabético
     cantoOptions.sort((a, b) => a.label.localeCompare(b.label));
-
-    setCantoOptions(cantoOptions);
+  
+    let optionsWithTop = [
+      { value: 'top3', label: 'Top 3' },
+      { value: 'top5', label: 'Top 5' },
+      { value: 'top7', label: 'Top 7' },
+      { value: 'top10', label: 'Top 10' },
+      { value: 'top15', label: 'Top 15' },
+      { value: 'top20', label: 'Top 20' },
+      ...cantoOptions,
+    ];
+  
+    if (selectedOption === 'top3' || selectedOption === 'top5' || selectedOption === 'top7' || selectedOption === 'top10' || selectedOption === 'top15' || selectedOption === 'top20') {
+      const topCanto = getTopCanto(report, selectedOption); // Obtener las principales cantidades según la opción seleccionada
+      optionsWithTop = optionsWithTop.filter((option) => {
+        return option.value === selectedOption || topCanto.includes(option.value);
+      });
+    }
+  
+    // Moving selected top option to the end
+    const selectedOptionIndex = optionsWithTop.findIndex(option => option.value === selectedOption);
+    if (selectedOptionIndex !== -1) {
+      const selectedOptionItem = optionsWithTop.splice(selectedOptionIndex, 1);
+      optionsWithTop = [...optionsWithTop, ...selectedOptionItem];
+    }
+  
+    setCantoOptions(optionsWithTop);
+  };
+  
+  const getTopCanto = (report, selectedOption) => {
+    const topCount = {
+      'top3': 3,
+      'top5': 5,
+      'top7': 7,
+      'top10': 10,
+      'top15': 15,
+      'top20': 20,
+    };
+    
+    const cantoCount = report.reduce((acc, curr) => {
+      acc[curr.canto] = (acc[curr.canto] || 0) + 1;
+      return acc;
+    }, {});
+  
+    const topCanto = Object.keys(cantoCount).sort((a, b) => cantoCount[b] - cantoCount[a]).slice(0, topCount[selectedOption]);
+  
+    return topCanto;
   };
 
-  const obtencionFiltroDistr = (report) => {
-    // Obtén la lista de status únicos desde tus datos
+  const obtencionFiltroDistr = (report, selectedOption) => {
+    // Obtén la lista de distritos únicos desde tus datos
     const distrOptions = [
       ...new Set(report.map((reporte) => reporte.distr)),
     ].map((distr) => ({
       value: distr,
       label: distr,
     }));
-    // Ordena la lista de status en orden alfabético
+    // Ordena la lista de distritos en orden alfabético
     distrOptions.sort((a, b) => a.label.localeCompare(b.label));
-
-    setDistrOptions(distrOptions);
+  
+    let optionsWithTop = [
+      { value: 'top3', label: 'Top 3' },
+      { value: 'top5', label: 'Top 5' },
+      { value: 'top7', label: 'Top 7' },
+      { value: 'top10', label: 'Top 10' },
+      { value: 'top15', label: 'Top 15' },
+      { value: 'top20', label: 'Top 20' },
+      ...distrOptions,
+    ];
+  
+    if (selectedOption === 'top3' || selectedOption === 'top5' || selectedOption === 'top7' || selectedOption === 'top10' || selectedOption === 'top15' || selectedOption === 'top20') {
+      const topDistr = getTopDistr(report, selectedOption); // Obtener los principales distritos según la opción seleccionada
+      optionsWithTop = optionsWithTop.filter((option) => {
+        return option.value === selectedOption || topDistr.includes(option.value);
+      });
+    }
+  
+    // Moving selected top option to the end
+    const selectedOptionIndex = optionsWithTop.findIndex(option => option.value === selectedOption);
+    if (selectedOptionIndex !== -1) {
+      const selectedOptionItem = optionsWithTop.splice(selectedOptionIndex, 1);
+      optionsWithTop = [...optionsWithTop, ...selectedOptionItem];
+    }
+  
+    setDistrOptions(optionsWithTop);
+  };
+  
+  const getTopDistr = (report, selectedOption) => {
+    const topCount = {
+      'top3': 3,
+      'top5': 5,
+      'top7': 7,
+      'top10': 10,
+      'top15': 15,
+      'top20': 20,
+    };
+    
+    const distrCount = report.reduce((acc, curr) => {
+      acc[curr.distr] = (acc[curr.distr] || 0) + 1;
+      return acc;
+    }, {});
+  
+    const topDistr = Object.keys(distrCount).sort((a, b) => distrCount[b] - distrCount[a]).slice(0, topCount[selectedOption]);
+  
+    return topDistr;
   };
 
-  const obtencionFiltroMateria = (report) => {
-    // Obtén la lista de status únicos desde tus datos
+  const obtencionFiltroMateria = (report, selectedOption) => {
+    // Obtén la lista de materias únicas desde tus datos
     const materiaOptions = [
       ...new Set(report.map((reporte) => reporte.materia)),
     ].map((materia) => ({
       value: materia,
       label: materia,
     }));
-    // Ordena la lista de status en orden alfabético
+    // Ordena la lista de materias en orden alfabético
     materiaOptions.sort((a, b) => a.label.localeCompare(b.label));
-
-    setMateriaOptions(materiaOptions);
+  
+    let optionsWithTop = [
+      { value: 'top3', label: 'Top 3' },
+      { value: 'top5', label: 'Top 5' },
+      { value: 'top7', label: 'Top 7' },
+      { value: 'top10', label: 'Top 10' },
+      { value: 'top15', label: 'Top 15' },
+      ...materiaOptions,
+    ];
+  
+    if (selectedOption === 'top3' || selectedOption === 'top5' || selectedOption === 'top7' || selectedOption === 'top10' || selectedOption === 'top15') {
+      const topMateria = getTopMateria(report, selectedOption); // Obtener las principales materias según la opción seleccionada
+      optionsWithTop = optionsWithTop.filter((option) => {
+        return option.value === selectedOption || topMateria.includes(option.value);
+      });
+    }
+  
+    // Moving selected top option to the end
+    const selectedOptionIndex = optionsWithTop.findIndex(option => option.value === selectedOption);
+    if (selectedOptionIndex !== -1) {
+      const selectedOptionItem = optionsWithTop.splice(selectedOptionIndex, 1);
+      optionsWithTop = [...optionsWithTop, ...selectedOptionItem];
+    }
+  
+    setMateriaOptions(optionsWithTop);
+  };
+  
+  const getTopMateria = (report, selectedOption) => {
+    const topCount = {
+      'top3': 3,
+      'top5': 5,
+      'top7': 7,
+      'top10': 10,
+      'top15': 15,
+    };
+    
+    const materiaCount = report.reduce((acc, curr) => {
+      acc[curr.materia] = (acc[curr.materia] || 0) + 1;
+      return acc;
+    }, {});
+  
+    const topMateria = Object.keys(materiaCount).sort((a, b) => materiaCount[b] - materiaCount[a]).slice(0, topCount[selectedOption]);
+  
+    return topMateria;
   };
 
-  const obtencionFiltroAsunto = (report) => {
-    // Obtén la lista de status únicos desde tus datos
+  const obtencionFiltroAsunto = (report, selectedOption) => {
+    // Obtén la lista de asuntos únicos desde tus datos
     const asuntoOptions = [
       ...new Set(report.map((reporte) => reporte.asunto)),
     ].map((asunto) => ({
       value: asunto,
       label: asunto,
     }));
-    // Ordena la lista de status en orden alfabético
+    // Ordena la lista de asuntos en orden alfabético
     asuntoOptions.sort((a, b) => a.label.localeCompare(b.label));
-
-    setAsuntoOptions(asuntoOptions);
+  
+    let optionsWithTop = [
+      { value: 'top3', label: 'Top 3' },
+      { value: 'top5', label: 'Top 5' },
+      { value: 'top7', label: 'Top 7' },
+      { value: 'top10', label: 'Top 10' },
+      { value: 'top15', label: 'Top 15' },
+      { value: 'top20', label: 'Top 20' },
+      ...asuntoOptions,
+    ];
+  
+    if (selectedOption === 'top3' || selectedOption === 'top5' || selectedOption === 'top7' || selectedOption === 'top10' || selectedOption === 'top15' || selectedOption === 'top20') {
+      const topAsunto = getTopAsunto(report, selectedOption); // Obtener los principales asuntos según la opción seleccionada
+      optionsWithTop = optionsWithTop.filter((option) => {
+        return option.value === selectedOption || topAsunto.includes(option.value);
+      });
+    }
+  
+    // Moving selected top option to the end
+    const selectedOptionIndex = optionsWithTop.findIndex(option => option.value === selectedOption);
+    if (selectedOptionIndex !== -1) {
+      const selectedOptionItem = optionsWithTop.splice(selectedOptionIndex, 1);
+      optionsWithTop = [...optionsWithTop, ...selectedOptionItem];
+    }
+  
+    setAsuntoOptions(optionsWithTop);
+  };
+  
+  const getTopAsunto = (report, selectedOption) => {
+    const topCount = {
+      'top3': 3,
+      'top5': 5,
+      'top7': 7,
+      'top10': 10,
+      'top15': 15,
+      'top20': 20,
+    };
+    
+    const asuntoCount = report.reduce((acc, curr) => {
+      acc[curr.asunto] = (acc[curr.asunto] || 0) + 1;
+      return acc;
+    }, {});
+  
+    const topAsunto = Object.keys(asuntoCount).sort((a, b) => asuntoCount[b] - asuntoCount[a]).slice(0, topCount[selectedOption]);
+  
+    return topAsunto;
   };
 
-  const obtencionFiltroBien = (report) => {
-    // Obtén la lista de status únicos desde tus datos
+  const obtencionFiltroBien = (report, selectedOption) => {
+    // Obtén la lista de bienes únicos desde tus datos
     const bienOptions = [
       ...new Set(report.map((reporte) => reporte.bien)),
     ].map((bien) => ({
       value: bien,
       label: bien,
     }));
-    // Ordena la lista de status en orden alfabético
+    // Ordena la lista de bienes en orden alfabético
     bienOptions.sort((a, b) => a.label.localeCompare(b.label));
-
-    setBienOptions(bienOptions);
+  
+    let optionsWithTop = [
+      { value: 'top3', label: 'Top 3' },
+      { value: 'top5', label: 'Top 5' },
+      { value: 'top7', label: 'Top 7' },
+      { value: 'top10', label: 'Top 10' },
+      { value: 'top15', label: 'Top 15' },
+      { value: 'top20', label: 'Top 20' },
+      ...bienOptions,
+    ];
+  
+    if (selectedOption === 'top3' || selectedOption === 'top5' || selectedOption === 'top7' || selectedOption === 'top10' || selectedOption === 'top15' || selectedOption === 'top20') {
+      const topBien = getTopBien(report, selectedOption); // Obtener los principales bienes según la opción seleccionada
+      optionsWithTop = optionsWithTop.filter((option) => {
+        return option.value === selectedOption || topBien.includes(option.value);
+      });
+    }
+  
+    // Moving selected top option to the end
+    const selectedOptionIndex = optionsWithTop.findIndex(option => option.value === selectedOption);
+    if (selectedOptionIndex !== -1) {
+      const selectedOptionItem = optionsWithTop.splice(selectedOptionIndex, 1);
+      optionsWithTop = [...optionsWithTop, ...selectedOptionItem];
+    }
+  
+    setBienOptions(optionsWithTop);
+  };
+  
+  const getTopBien = (report, selectedOption) => {
+    const topCount = {
+      'top3': 3,
+      'top5': 5,
+      'top7': 7,
+      'top10': 10,
+      'top15': 15,
+      'top20': 20,
+    };
+    
+    const bienCount = report.reduce((acc, curr) => {
+      acc[curr.bien] = (acc[curr.bien] || 0) + 1;
+      return acc;
+    }, {});
+  
+    const topBien = Object.keys(bienCount).sort((a, b) => bienCount[b] - bienCount[a]).slice(0, topCount[selectedOption]);
+  
+    return topBien;
   };
 
   const obtencionFiltroTdic = (report) => {
@@ -423,8 +722,21 @@ const obtencionFiltroAgente = (report) => {
 
   const handleSelectAgent = (selectedOptions) => {
     setSelectedAgents(selectedOptions);
+  
+    const selectedValues = selectedOptions.map((option) => option.value);
+    const topOptions = ['top3', 'top5', 'top7', 'top10'];
+  
+    if (selectedValues.some((value) => topOptions.includes(value))) {
+      const topOption = selectedValues.find((value) => topOptions.includes(value));
+      const selectedAgents = selectedValues.filter((value) => !topOptions.includes(value));
+      selectedAgents.push(topOption); // Agregar la opción Top a los agentes seleccionados
+      const topAgents = getTopAgents(allreportes, topOption);
+      const topAgentOptions = agentOptions.filter((option) => topAgents.includes(option.value));
+      setSelectedAgents([...selectedOptions, ...topAgentOptions]);
+    }
+  
     setCurrentPage(1);
-  };
+  };  
 
   const handleFiltroFchCreado = (e) => {
     setFiltroFchCreado(e.target.value);
@@ -498,33 +810,111 @@ const obtencionFiltroAgente = (report) => {
 
   const handleSelectProvi = (selectedOptions) => {
     setSelectedProvi(selectedOptions);
+  
+    const selectedValues = selectedOptions.map((option) => option.value);
+    const topOptions = ['top3', 'top5', 'top7', 'top10'];
+  
+    if (selectedValues.some((value) => topOptions.includes(value))) {
+      const topOption = selectedValues.find((value) => topOptions.includes(value));
+      const selectedProv = selectedValues.filter((value) => !topOptions.includes(value));
+      selectedProv.push(topOption); // Agregar la opción Top a las provincias seleccionadas
+      const topProvi = getTopProvi(allreportes, topOption); // Obtener las principales provincias según la opción seleccionada
+      const topProviOptions = proviOptions.filter((option) => topProvi.includes(option.value));
+      setSelectedProvi([...selectedOptions, ...topProviOptions]);
+    }
+  
     setCurrentPage(1);
   };
-
+  
   const handleSelectCanto = (selectedOptions) => {
     setSelectedCanto(selectedOptions);
+  
+    const selectedValues = selectedOptions.map((option) => option.value);
+    const topOptions = ['top3', 'top5', 'top7', 'top10', 'top15', 'top20'];
+  
+    if (selectedValues.some((value) => topOptions.includes(value))) {
+      const topOption = selectedValues.find((value) => topOptions.includes(value));
+      const selectedCanto = selectedValues.filter((value) => !topOptions.includes(value));
+      selectedCanto.push(topOption); // Agregar la opción Top a las cantidades seleccionadas
+      const topCanto = getTopCanto(allreportes, topOption); // Obtener las principales cantidades según la opción seleccionada
+      const topCantoOptions = cantoOptions.filter((option) => topCanto.includes(option.value));
+      setSelectedCanto([...selectedOptions, ...topCantoOptions]);
+    }
+  
     setCurrentPage(1);
   };
 
   const handleSelectDistr = (selectedOptions) => {
     setSelectedDistr(selectedOptions);
+  
+    const selectedValues = selectedOptions.map((option) => option.value);
+    const topOptions = ['top3', 'top5', 'top7', 'top10', 'top15', 'top20'];
+  
+    if (selectedValues.some((value) => topOptions.includes(value))) {
+      const topOption = selectedValues.find((value) => topOptions.includes(value));
+      const selectedDistr = selectedValues.filter((value) => !topOptions.includes(value));
+      selectedDistr.push(topOption); // Agregar la opción Top a los distritos seleccionados
+      const topDistr = getTopDistr(allreportes, topOption); // Obtener los principales distritos según la opción seleccionada
+      const topDistrOptions = distrOptions.filter((option) => topDistr.includes(option.value));
+      setSelectedDistr([...selectedOptions, ...topDistrOptions]);
+    }
+  
     setCurrentPage(1);
   };
 
   const handleSelectMateria = (selectedOptions) => {
     setSelectedMateria(selectedOptions);
+  
+    const selectedValues = selectedOptions.map((option) => option.value);
+    const topOptions = ['top3', 'top5', 'top7', 'top10', 'top15'];
+  
+    if (selectedValues.some((value) => topOptions.includes(value))) {
+      const topOption = selectedValues.find((value) => topOptions.includes(value));
+      const selectedMateria = selectedValues.filter((value) => !topOptions.includes(value));
+      selectedMateria.push(topOption); // Agregar la opción Top a las materias seleccionadas
+      const topMateria = getTopMateria(allreportes, topOption); // Obtener los principales materia según la opción seleccionada
+      const topMateriaOptions = materiaOptions.filter((option) => topMateria.includes(option.value));
+      setSelectedMateria([...selectedOptions, ...topMateriaOptions]);
+    }
+  
     setCurrentPage(1);
   };
 
   const handleSelectAsunto = (selectedOptions) => {
     setSelectedAsunto(selectedOptions);
+  
+    const selectedValues = selectedOptions.map((option) => option.value);
+    const topOptions = ['top3', 'top5', 'top7', 'top10', 'top15', 'top20'];
+  
+    if (selectedValues.some((value) => topOptions.includes(value))) {
+      const topOption = selectedValues.find((value) => topOptions.includes(value));
+      const selectedAsunto = selectedValues.filter((value) => !topOptions.includes(value));
+      selectedAsunto.push(topOption); // Agregar la opción Top a los asuntos seleccionados
+      const topAsunto = getTopAsunto(allreportes, topOption); // Obtener los principales asuntos según la opción seleccionada
+      const topAsuntoOptions = asuntoOptions.filter((option) => topAsunto.includes(option.value));
+      setSelectedAsunto([...selectedOptions, ...topAsuntoOptions]);
+    }
+  
     setCurrentPage(1);
   };
-
+  
   const handleSelectBien = (selectedOptions) => {
     setSelectedBien(selectedOptions);
+  
+    const selectedValues = selectedOptions.map((option) => option.value);
+    const topOptions = ['top3', 'top5', 'top7', 'top10', 'top15', 'top20'];
+  
+    if (selectedValues.some((value) => topOptions.includes(value))) {
+      const topOption = selectedValues.find((value) => topOptions.includes(value));
+      const selectedBien = selectedValues.filter((value) => !topOptions.includes(value));
+      selectedBien.push(topOption); // Agregar la opción Top a los bienes seleccionados
+      const topBien = getTopBien(allreportes, topOption); // Obtener los principales bienes según la opción seleccionada
+      const topBienOptions = bienOptions.filter((option) => topBien.includes(option.value));
+      setSelectedBien([...selectedOptions, ...topBienOptions]);
+    }
+  
     setCurrentPage(1);
-  };
+  };  
 
   const handleSelectTdic = (selectedOptions) => {
     setSelectedTdic(selectedOptions);
@@ -613,7 +1003,7 @@ const obtencionFiltroAgente = (report) => {
       reporte["Respuesta Enviada"] = reporte.respe;
       reporte["ID Audio"] = reporte.id_audio;
 
-            // Eliminacion de las columnas originales
+      // Eliminacion de las columnas originales
       delete reporte.id_report;
       delete reporte.id_agente;
       delete reporte.fchareg;
@@ -651,12 +1041,340 @@ const obtencionFiltroAgente = (report) => {
       delete reporte.id_correo;
 
     });
+    
+    const selectedValues = selectedAgents.map((option) => option.value);
+    const selectedValuesProvi = selectedProvi.map((option) => option.value);
+    const selectedValuesCanto = selectedCanto.map((option) => option.value);
+    const selectedValuesDistr = selectedDistr.map((option) => option.value);
+    const selectedValuesMateria = selectedMateria.map((option) => option.value);
+    const selectedValuesAsunto = selectedAsunto.map((option) => option.value);
+    const selectedValuesBien = selectedBien.map((option) => option.value);
 
-    const ws = XLSX.utils.json_to_sheet(datosExportar);
-    const wb = XLSX.utils.book_new(); //Genera nuevo libro
-    const sheetName = "SolicitudAsesorias"; //Nombre de la pestaña
-    XLSX.utils.book_append_sheet(wb, ws, sheetName);
-    XLSX.writeFile(wb, "Reporte_General.xlsx"); //Nombre del documento
+    console.log('Selected Values:', selectedValues);
+  
+    if (
+      selectedValues.includes('top3') ||
+      selectedValues.includes('top5') ||
+      selectedValues.includes('top7') ||
+      selectedValues.includes('top10')
+    ) {
+      console.log('Enters top condition');
+      
+      const selectedOption = selectedValues.find((option) =>
+        ['top3', 'top5', 'top7', 'top10'].includes(option)
+      );
+  
+      console.log('Selected Option:', selectedOption);
+  
+      const topAgents = getTopAgents(allreportes, selectedOption);
+      const topAgentOptions = agentOptions.filter((option) =>
+        topAgents.includes(option.value)
+      );
+      setSelectedAgents(topAgentOptions);
+  
+      const conteoAgentes = obtenerConteoAgentes(datosExportar);
+      const conteoAgentesSheet = XLSX.utils.json_to_sheet(conteoAgentes);
+  
+      const ws = XLSX.utils.json_to_sheet(datosExportar);
+      const wb = XLSX.utils.book_new();
+      const sheetName = 'SolicitudAsesorias';
+  
+      XLSX.utils.book_append_sheet(wb, ws, sheetName);
+      XLSX.utils.book_append_sheet(wb, conteoAgentesSheet, 'ConteoAgentes');
+  
+      console.log('Writing file...');
+      XLSX.writeFile(wb, 'Reporte_General.xlsx');
+    } else if(
+      selectedValuesProvi.includes('top3') ||
+      selectedValuesProvi.includes('top5') ||
+      selectedValuesProvi.includes('top7') ||
+      selectedValuesProvi.includes('top10')
+    ){
+      const selectedOptionProvi = selectedValuesProvi.find((option) =>
+        ['top3', 'top5', 'top7', 'top10'].includes(option)
+      );
+
+      const topProvi = getTopProvi(allreportes, selectedOptionProvi);
+      const topProviOptions = proviOptions.filter((option) =>
+        topProvi.includes(option.value)
+      );
+      setSelectedProvi(topProviOptions);
+  
+      const conteoProvincias = obtenerConteoProvincia(datosExportar);
+      const conteoProvinciasSheet = XLSX.utils.json_to_sheet(conteoProvincias);
+  
+      const ws = XLSX.utils.json_to_sheet(datosExportar);
+      const wb = XLSX.utils.book_new();
+      const sheetName = 'SolicitudAsesorias';
+  
+      XLSX.utils.book_append_sheet(wb, ws, sheetName);
+      XLSX.utils.book_append_sheet(wb, conteoProvinciasSheet, 'ConteoProvincias');
+  
+      console.log('Writing file...');
+      XLSX.writeFile(wb, 'Reporte_General.xlsx');
+    }
+    else if(
+      selectedValuesCanto.includes('top3') ||
+      selectedValuesCanto.includes('top5') ||
+      selectedValuesCanto.includes('top7') ||
+      selectedValuesCanto.includes('top10')
+    ){
+      const selectedOptionCanto = selectedValuesCanto.find((option) =>
+        ['top3', 'top5', 'top7', 'top10'].includes(option)
+      );
+
+      const topCanto = getTopCanto(allreportes, selectedOptionCanto);
+      const topCantoOptions = cantoOptions.filter((option) =>
+        topCanto.includes(option.value)
+      );
+      setSelectedCanto(topCantoOptions);
+  
+      const conteoCantones = obtenerConteoCanton(datosExportar);
+      const conteoCantonesSheet = XLSX.utils.json_to_sheet(conteoCantones);
+  
+      const ws = XLSX.utils.json_to_sheet(datosExportar);
+      const wb = XLSX.utils.book_new();
+      const sheetName = 'SolicitudAsesorias';
+  
+      XLSX.utils.book_append_sheet(wb, ws, sheetName);
+      XLSX.utils.book_append_sheet(wb, conteoCantonesSheet, 'conteoCantones');
+  
+      console.log('Writing file...');
+      XLSX.writeFile(wb, 'Reporte_General.xlsx');
+    }
+    else if(
+      selectedValuesDistr.includes('top3') ||
+      selectedValuesDistr.includes('top5') ||
+      selectedValuesDistr.includes('top7') ||
+      selectedValuesDistr.includes('top10') ||
+      selectedValuesDistr.includes('top15') ||
+      selectedValuesDistr.includes('top20')
+    ){
+      const selectedOptionDistr = selectedValuesDistr.find((option) =>
+        ['top3', 'top5', 'top7', 'top10', 'top15', 'top20'].includes(option)
+      );
+
+      const topDistr = getTopDistr(allreportes, selectedOptionDistr);
+      const topDistrOptions = distrOptions.filter((option) =>
+        topDistr.includes(option.value)
+      );
+      setSelectedDistr(topDistrOptions);
+  
+      const conteoDistritos = obtenerConteoDistrito(datosExportar);
+      const conteoDistritosSheet = XLSX.utils.json_to_sheet(conteoDistritos);
+  
+      const ws = XLSX.utils.json_to_sheet(datosExportar);
+      const wb = XLSX.utils.book_new();
+      const sheetName = 'SolicitudAsesorias';
+  
+      XLSX.utils.book_append_sheet(wb, ws, sheetName);
+      XLSX.utils.book_append_sheet(wb, conteoDistritosSheet, 'conteoDistritos');
+  
+      console.log('Writing file...');
+      XLSX.writeFile(wb, 'Reporte_General.xlsx');
+    }
+    else if(
+      selectedValuesMateria.includes('top3') ||
+      selectedValuesMateria.includes('top5') ||
+      selectedValuesMateria.includes('top7') ||
+      selectedValuesMateria.includes('top10') ||
+      selectedValuesMateria.includes('top15')
+    ){
+      const selectedOptionMateria = selectedValuesMateria.find((option) =>
+        ['top3', 'top5', 'top7', 'top10', 'top15'].includes(option)
+      );
+
+      const topMateria = getTopMateria(allreportes, selectedOptionMateria);
+      const topMateriaOptions = materiaOptions.filter((option) =>
+        topMateria.includes(option.value)
+      );
+      setSelectedMateria(topMateriaOptions);
+  
+      const conteoMaterias = obtenerConteoMateria(datosExportar);
+      const conteoMateriasSheet = XLSX.utils.json_to_sheet(conteoMaterias);
+  
+      const ws = XLSX.utils.json_to_sheet(datosExportar);
+      const wb = XLSX.utils.book_new();
+      const sheetName = 'SolicitudAsesorias';
+  
+      XLSX.utils.book_append_sheet(wb, ws, sheetName);
+      XLSX.utils.book_append_sheet(wb, conteoMateriasSheet, 'conteoMaterias');
+  
+      console.log('Writing file...');
+      XLSX.writeFile(wb, 'Reporte_General.xlsx');
+    }
+    else if(
+      selectedValuesAsunto.includes('top3') ||
+      selectedValuesAsunto.includes('top5') ||
+      selectedValuesAsunto.includes('top7') ||
+      selectedValuesAsunto.includes('top10') ||
+      selectedValuesAsunto.includes('top15') ||
+      selectedValuesAsunto.includes('top20')
+    ){
+      const selectedOptionAsunto = selectedValuesAsunto.find((option) =>
+        ['top3', 'top5', 'top7', 'top10', 'top15', 'top20'].includes(option)
+      );
+
+      const topAsunto = getTopAsunto(allreportes, selectedOptionAsunto);
+      const topAsuntoOptions = asuntoOptions.filter((option) =>
+        topAsunto.includes(option.value)
+      );
+      setSelectedAsunto(topAsuntoOptions);
+  
+      const conteoAsuntos = obtenerConteoAsunto(datosExportar);
+      const conteoAsuntosSheet = XLSX.utils.json_to_sheet(conteoAsuntos);
+  
+      const ws = XLSX.utils.json_to_sheet(datosExportar);
+      const wb = XLSX.utils.book_new();
+      const sheetName = 'SolicitudAsesorias';
+  
+      XLSX.utils.book_append_sheet(wb, ws, sheetName);
+      XLSX.utils.book_append_sheet(wb, conteoAsuntosSheet, 'conteoAsuntos');
+  
+      console.log('Writing file...');
+      XLSX.writeFile(wb, 'Reporte_General.xlsx');
+    }
+    else if(
+      selectedValuesBien.includes('top3') ||
+      selectedValuesBien.includes('top5') ||
+      selectedValuesBien.includes('top7') ||
+      selectedValuesBien.includes('top10') ||
+      selectedValuesBien.includes('top15') ||
+      selectedValuesBien.includes('top20')
+    ){
+      const selectedOptionBien = selectedValuesBien.find((option) =>
+        ['top3', 'top5', 'top7', 'top10', 'top15', 'top20'].includes(option)
+      );
+
+      const topBien = getTopBien(allreportes, selectedOptionBien);
+      const topBienOptions = bienOptions.filter((option) =>
+        topBien.includes(option.value)
+      );
+      setSelectedBien(topBienOptions);
+  
+      const conteoBienes = obtenerConteoBien(datosExportar);
+      const conteoBienesSheet = XLSX.utils.json_to_sheet(conteoBienes);
+  
+      const ws = XLSX.utils.json_to_sheet(datosExportar);
+      const wb = XLSX.utils.book_new();
+      const sheetName = 'SolicitudAsesorias';
+  
+      XLSX.utils.book_append_sheet(wb, ws, sheetName);
+      XLSX.utils.book_append_sheet(wb, conteoBienesSheet, 'conteoBienes');
+  
+      console.log('Writing file...');
+      XLSX.writeFile(wb, 'Reporte_General.xlsx');
+    }
+      else {
+      console.log('Enters else condition');
+      
+      const ws = XLSX.utils.json_to_sheet(datosExportar);
+      const wb = XLSX.utils.book_new();
+      const sheetName = 'SolicitudAsesorias';
+  
+      XLSX.utils.book_append_sheet(wb, ws, sheetName);
+  
+      console.log('Writing file...');
+      XLSX.writeFile(wb, 'Reporte_General.xlsx');
+    }
+  };
+  
+  const obtenerConteoAgentes = (data) => {
+    const agentCount = data.reduce((acc, curr) => {
+      acc[curr.Agente] = (acc[curr.Agente] || 0) + 1;
+      return acc;
+    }, {});
+  
+    const conteoAgentesArray = Object.keys(agentCount).map((agente) => ({
+      Agente: agente,
+      "Cantidad de Reportes": agentCount[agente],
+    }));
+  
+    return conteoAgentesArray;
+  };
+
+  const obtenerConteoProvincia = (data) => {
+    const proviCount = data.reduce((acc, curr) => {
+      acc[curr.Provincia] = (acc[curr.Provincia] || 0) + 1;
+      return acc;
+    }, {});
+  
+    const conteoProvinciasArray = Object.keys(proviCount).map((provincia) => ({
+      Provincia: provincia,
+      "Cantidad de Reportes": proviCount[provincia],
+    }));
+  
+    return conteoProvinciasArray;
+  };
+
+  const obtenerConteoCanton = (data) => {
+    const cantoCount = data.reduce((acc, curr) => {
+      acc[curr.Canton] = (acc[curr.Canton] || 0) + 1;
+      return acc;
+    }, {});
+  
+    const conteoCantonesArray = Object.keys(cantoCount).map((canton) => ({
+      Canton: canton,
+      "Cantidad de Reportes": cantoCount[canton],
+    }));
+  
+    return conteoCantonesArray;
+  };
+
+  const obtenerConteoDistrito = (data) => {
+    const distrCount = data.reduce((acc, curr) => {
+      acc[curr.Distrito] = (acc[curr.Distrito] || 0) + 1;
+      return acc;
+    }, {});
+  
+    const conteoDistritosArray = Object.keys(distrCount).map((distrito) => ({
+      Distrito: distrito,
+      "Cantidad de Reportes": proviCount[distrito],
+    }));
+  
+    return conteoDistritosArray;
+  };
+
+  const obtenerConteoMateria = (data) => {
+    const materiaCount = data.reduce((acc, curr) => {
+      acc[curr.Materia] = (acc[curr.Materia] || 0) + 1;
+      return acc;
+    }, {});
+  
+    const conteoMateriasArray = Object.keys(materiaCount).map((materia) => ({
+      Materia: materia,
+      "Cantidad de Reportes": materiaCount[materia],
+    }));
+  
+    return conteoMateriasArray;
+  };
+
+  const obtenerConteoAsunto = (data) => {
+    const asuntoCount = data.reduce((acc, curr) => {
+      acc[curr.Asunto] = (acc[curr.Asunto] || 0) + 1;
+      return acc;
+    }, {});
+  
+    const conteoAsuntosArray = Object.keys(asuntoCount).map((asunto) => ({
+      Asunto: asunto,
+      "Cantidad de Reportes": asuntoCount[asunto],
+    }));
+  
+    return conteoAsuntosArray;
+  };
+
+  const obtenerConteoBien = (data) => {
+    const bienCount = data.reduce((acc, curr) => {
+      acc[curr.Bien] = (acc[curr.Bien] || 0) + 1;
+      return acc;
+    }, {});
+  
+    const conteoBienesArray = Object.keys(bienCount).map((bien) => ({
+      Bien: bien,
+      "Cantidad de Reportes": bienCount[bien],
+    }));
+  
+    return conteoBienesArray;
   };
 
   const exportarTodosLosDatosAPDF = () => {
@@ -1075,7 +1793,7 @@ const obtencionFiltroAgente = (report) => {
   return (
     <>
       <nav className="navbar bg-white fixed-top position-fixed top-0 shadow" style={{ background: "rgba(255, 255, 255, 0.8)" }}>
-  <div className="container" style={{ maxWidth: "1200px" }}>
+        <div className="container" style={{ maxWidth: "1200px" }}>
           <img
             src={meicimg}
             alt="MEIC"
