@@ -248,9 +248,31 @@ const CompFormpres = () => {
   //#region Validacion de inputs
 
   const EnviarDatos = async (v) => {
-    let fecha = new Date().toLocaleString();
-    let fchareg = fecha;
-    setFchareg(fecha);
+    let fecha = new Date();
+
+// Obtener la fecha en formato dd/mm/aaaa
+let fechaFormato = fecha.toLocaleDateString("es-ES", {
+  year: "numeric",
+  month: "numeric",
+  day: "numeric",
+});
+
+// Obtener la hora en formato hh:mm:ss
+let horaFormato = fecha.toLocaleTimeString("es-ES", {
+  hour: "numeric",
+  minute: "numeric",
+  second: "numeric",
+});
+
+// Concatenar la fecha y hora formateadas con una coma
+let fchareg = fechaFormato + ", " + horaFormato;
+
+// Eliminar el "0" delante de la hora si existe
+if (horaFormato.charAt(0) === "0") {
+  fchareg = fchareg.replace("0", "");
+}
+
+setFchareg(fchareg);
 
     if (v === 1) {
       console.log("EnviarDatos se llama de forma reciproca");
