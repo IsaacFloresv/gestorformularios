@@ -160,6 +160,7 @@ function Dashboard() {
       { value: 'top5', label: 'Top 5' },
       { value: 'top7', label: 'Top 7' },
       { value: 'top10', label: 'Top 10' },
+      { value: 'top15', label: 'Top 15' },
       ...agentOptions,
     ];
   
@@ -187,6 +188,7 @@ function Dashboard() {
       'top5': 5,
       'top7': 7,
       'top10': 10,
+      'top15': 15,
     };
     
     const agentCount = report.reduce((acc, curr) => {
@@ -261,7 +263,7 @@ function Dashboard() {
       ...proviOptions,
     ];
   
-    if (selectedOption === 'top3' || selectedOption === 'top5' || selectedOption === 'top7' || selectedOption === 'top10') {
+    if (selectedOption === 'top3' || selectedOption === 'top5' || selectedOption === 'top7' || selectedOption === 'top10' || selectedOption === 'top15') {
       const topProvi = getTopProvi(report, selectedOption); // Obtener las principales provincias según la opción seleccionada
       optionsWithTop = optionsWithTop.filter((option) => {
         return option.value === selectedOption || topProvi.includes(option.value);
@@ -724,7 +726,7 @@ function Dashboard() {
     setSelectedAgents(selectedOptions);
   
     const selectedValues = selectedOptions.map((option) => option.value);
-    const topOptions = ['top3', 'top5', 'top7', 'top10'];
+    const topOptions = ['top3', 'top5', 'top7', 'top10','top15'];
   
     if (selectedValues.some((value) => topOptions.includes(value))) {
       const topOption = selectedValues.find((value) => topOptions.includes(value));
@@ -1056,12 +1058,13 @@ function Dashboard() {
       selectedValues.includes('top3') ||
       selectedValues.includes('top5') ||
       selectedValues.includes('top7') ||
-      selectedValues.includes('top10')
+      selectedValues.includes('top10') ||
+      selectedValues.includes('top15')
     ) {
       console.log('Enters top condition');
       
       const selectedOption = selectedValues.find((option) =>
-        ['top3', 'top5', 'top7', 'top10'].includes(option)
+        ['top3', 'top5', 'top7', 'top10', 'top15'].includes(option)
       );
   
       console.log('Selected Option:', selectedOption);
@@ -1615,6 +1618,7 @@ function Dashboard() {
   //Funciones para vistas
 
   const opcionesSelect = [
+    { label: "Origen año 2024", value: 3 },
     { label: "Origen año 2023", value: 1 },
     { label: "Origen año 2022", value: 2 },
     // Agrega más opciones si es necesario
@@ -1772,6 +1776,68 @@ function Dashboard() {
 
   return datosTabla;
     }
+    else if (opcionSeleccionada === 3) {
+      // Obtén los datos necesarios para la tabla (por ejemplo, los datos filtrados)
+   const datosFiltrados = allreportes.filter(reporte => {
+     const [fechaPart] = reporte.fchareg.split(', ');
+     const [fecha] = fechaPart.split(' ');
+ 
+     const [dia, mes, ano] = fecha.split('/');
+     return ano === '2024';
+   });
+ 
+   // Crear un objeto para almacenar el recuento de reportes por origen y mes
+   const recuentoPorMesYOrigen = {};
+ 
+   // Iterar sobre los reportes y contar por origen y mes
+   datosFiltrados.forEach(reporte => {
+     const nombreMes = obtenerNombreMes(reporte);
+     const origen = reporte.origen_r;
+ 
+     // Inicializar el recuento si es la primera vez que vemos este origen en este mes
+     if (!recuentoPorMesYOrigen[nombreMes]) {
+       recuentoPorMesYOrigen[nombreMes] = {};
+     }
+     if (!recuentoPorMesYOrigen[nombreMes][origen]) {
+       recuentoPorMesYOrigen[nombreMes][origen] = 0;
+     }
+ 
+     // Incrementar el recuento
+     recuentoPorMesYOrigen[nombreMes][origen]++;
+   });
+ 
+   // Transformar el objeto y calcular el total por origen
+   const datosTabla = Object.keys(recuentoPorMesYOrigen).map(mes => {
+     const recuentoPorOrigen = recuentoPorMesYOrigen[mes];
+     const fila = {
+       Mes: mes,
+       ...recuentoPorOrigen,
+     };
+ 
+     // Calcular el total por origen y agregarlo a la fila
+     fila.Total = Object.values(recuentoPorOrigen).reduce((total, count) => total + count, 0);
+ 
+     return fila;
+   });
+ 
+   // Agregar la fila de totales al final
+   const filaTotales = {
+     Mes: 'Total',
+     ...Object.keys(recuentoPorMesYOrigen).reduce((totales, mes) => {
+       Object.keys(recuentoPorMesYOrigen[mes]).forEach(origen => {
+         if (!totales[origen]) {
+           totales[origen] = 0;
+         }
+         totales[origen] += recuentoPorMesYOrigen[mes][origen];
+       });
+       return totales;
+     }, {}),
+   };
+ 
+   datosTabla.push(filaTotales);
+ 
+   return datosTabla;
+     }
   };
   
   const obtenerNombreMes = (reporte) => {
