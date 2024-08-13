@@ -1687,6 +1687,7 @@ setFchareg(fchareg);
                 </option>
                 <option defaultValue="1">Escalar</option>
                 <option defaultValue="2">Atender con prontitud</option>
+                <option defaultValue="4">Recepción Denuncia</option>
               </select>
             </div>
             <div id="divinputtoRegistro" className={hiddentelObser}>
