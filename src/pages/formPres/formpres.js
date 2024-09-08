@@ -492,6 +492,24 @@ setFchareg(fchareg);
         setIdcorreo("");
         setIdaudio("NO INDICA");
         break;
+
+      case 3:
+          setHiddentelorig("d-block col-md-3");
+          setdehabIdAudio("d-block col-md-3");
+          settoRegistro("");
+          setIdaudio("");
+          setIdcorreo("NO INDICA");
+          setdehabIdCorreo("d-none");
+          break;
+
+      case 4:
+          setHiddentelorig("d-block col-md-3");
+          setdehabIdAudio("d-block col-md-3");
+          settoRegistro("");
+          setIdaudio("");
+          setIdcorreo("NO INDICA");
+          setdehabIdCorreo("d-none");
+          break;
     }
   };
 
@@ -1619,6 +1637,8 @@ setFchareg(fchareg);
                 </option>
                 <option defaultValue="1">llamada entrante (linea 800)</option>
                 <option defaultValue="2">formulario web</option>
+                <option defaultValue="3">Atención Denuncias</option>
+                <option defaultValue="4">Atención Whatsapp</option>
               </select>
             </div>
             <div id="divinputtoRegistro" className={hiddentelorig}>
