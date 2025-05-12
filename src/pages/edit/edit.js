@@ -434,6 +434,24 @@ Promise.race([axios.request(reqOptions), timeoutPromise])
         setIdcorreo("");
         setIdaudio("NO INDICA");
         break;
+
+      case 3:
+        setHiddentelorig("d-block col-md-3");
+        setdehabIdAudio("d-block col-md-3");
+        settoRegistro("");
+        setIdaudio("");
+        setIdcorreo("NO INDICA");
+        setdehabIdCorreo("d-none");
+        break;
+
+      case 4:
+        setHiddentelorig("d-block col-md-3");
+        setdehabIdAudio("d-block col-md-3");
+        settoRegistro("");
+        setIdaudio("");
+        setIdcorreo("NO INDICA");
+        setdehabIdCorreo("d-none");
+        break;
     }
   };
 
@@ -452,12 +470,21 @@ Promise.race([axios.request(reqOptions), timeoutPromise])
       setIdaudio("");
       setIdcorreo("NO INDICA");
       setdehabIdCorreo("d-none");
-    }else if(valor == "formulario web"){
-      setHiddentelorig("d-none");
-      setdehabIdAudio("d-none");
-      setdehabIdCorreo("d-block col-md-3");
-      setIdcorreo("");
-      setIdaudio("NO INDICA");
+    }else if(valor == "Atención Denuncias"){
+      setHiddentelorig("d-block col-md-3");
+      setdehabIdAudio("d-block col-md-3");
+      settoRegistro("");
+      setIdaudio("");
+      setIdcorreo("NO INDICA");
+      setdehabIdCorreo("d-none");
+    }
+    else if(valor == "Atención Whatsapp"){
+      setHiddentelorig("d-block col-md-3");
+      setdehabIdAudio("d-block col-md-3");
+      settoRegistro("");
+      setIdaudio("");
+      setIdcorreo("NO INDICA");
+      setdehabIdCorreo("d-none");
     }
   };
 
