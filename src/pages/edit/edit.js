@@ -1990,6 +1990,8 @@ const ValidarinputcedCEdit = (val) => {
                 </option>
                 <option defaultValue="1">llamada entrante (linea 800)</option>
                 <option defaultValue="2">formulario web</option>
+                <option defaultValue="3">Atención Denuncias</option>
+                <option defaultValue="4">Atención Whatsapp</option>
               </select>
             </div>
             <div id="divinputtoRegistro" className={hiddentelorig}>
