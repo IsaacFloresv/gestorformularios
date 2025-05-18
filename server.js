@@ -30,8 +30,8 @@ app.get('/', function (req, res) {
   res.sendFile(path.join(__dirname, './', 'index.html'));
 });
 
-// Usar el puerto proporcionado por Railway o 9000 por defecto (para local)
-const PORT = process.env.PORT || 9000;
+// Usar el puerto proporcionado por Railway o 3000 por defecto (para local)
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
