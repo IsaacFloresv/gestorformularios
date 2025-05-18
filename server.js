@@ -1,27 +1,27 @@
 const express = require('express');
 const path = require('path');
-const mysql = require('mysql2/promise');
+const axios = require('axios');  // para hacer la llamada HTTP
 
 const app = express();
 
-// Configura la conexión a tu base de datos
-const dbConfig = {
-  host: 'viaduct.proxy.rlwy.net',     // o el host que use Railway
-  user: 'root',    // usuario MySQL
-  password: 'hbb6hfAH5g541h5Hhe3ca5fhdDF4AGa4',
-  database: 'meic'
-};
+const URI = "https://fwmback-production.up.railway.app/";
 
-// Endpoint de healthcheck con verificación de BD
+// Endpoint healthcheck que verifica la API
 app.get('/health', async (req, res) => {
   try {
-    const connection = await mysql.createConnection(dbConfig);
-    await connection.execute('SELECT 1'); // simple test query
-    await connection.end();
-    res.status(200).send('OK');
+    // Hacemos una petición GET a la API
+    const response = await axios.get(URI);
+
+    // Si la API responde con status 200, consideramos que está OK
+    if (response.status === 200) {
+      res.status(200).send('OK');
+    } else {
+      // Si no responde 200, enviamos error
+      res.status(500).send('API not healthy');
+    }
   } catch (err) {
-    console.error('DB Error:', err.message);
-    res.status(500).send('Database not connected');
+    console.error('API Error:', err.message);
+    res.status(500).send('API not reachable');
   }
 });
 
@@ -36,4 +36,3 @@ const PORT = process.env.PORT || 9000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
-
