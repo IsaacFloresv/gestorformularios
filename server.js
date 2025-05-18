@@ -1,38 +1,37 @@
 const express = require('express');
 const path = require('path');
-const axios = require('axios');  // para hacer la llamada HTTP
+const axios = require('axios');
 
 const app = express();
 
-const URI = "https://fwmback-production.up.railway.app/";
-
-// Endpoint healthcheck que verifica la API
+// Endpoint de healthcheck que verifica la API externa
 app.get('/health', async (req, res) => {
   try {
-    // Hacemos una petición GET a la API
-    const response = await axios.get(URI);
-
-    // Si la API responde con status 200, consideramos que está OK
+    // Llamada a tu backend (que maneja la conexión con la BD)
+    const response = await axios.get('https://fwmback-production.up.railway.app/user');
+    
+    // Si responde con 200, todo está bien
     if (response.status === 200) {
       res.status(200).send('OK');
     } else {
-      // Si no responde 200, enviamos error
-      res.status(500).send('API not healthy');
+      res.status(500).send('API responded but not OK');
     }
-  } catch (err) {
-    console.error('API Error:', err.message);
+  } catch (error) {
+    console.error('API Error:', error.message);
     res.status(500).send('API not reachable');
   }
 });
 
+// Servir archivos estáticos
 app.use(express.static(path.join(__dirname, './')));
 
+// Ruta principal
 app.get('/', function (req, res) {
   res.sendFile(path.join(__dirname, './', 'index.html'));
 });
 
+// Usar el puerto proporcionado por Railway o 9000 por defecto (para local)
 const PORT = process.env.PORT || 9000;
-
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
