@@ -9,7 +9,7 @@ const dbConfig = {
   host: 'viaduct.proxy.rlwy.net',     // o el host que use Railway
   user: 'root',    // usuario MySQL
   password: 'hbb6hfAH5g541h5Hhe3ca5fhdDF4AGa4',
-  database: 'railway'
+  database: 'meic'
 };
 
 // Endpoint de healthcheck con verificación de BD
