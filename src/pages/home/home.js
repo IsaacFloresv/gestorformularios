@@ -115,29 +115,34 @@ function Home() {
         </div>
       </nav>
 
- 
-          <br/>
-        <br/>
-      <br/>
       <br/>
         <br/>
       <br/>
-      <div className="container-fluid top-50">
-        <div className="row">
-      <img
-            src={meicimg}
-            alt="MEIC"
-            width="160"
-            height="200"
-            className="col d-flex justify-content-start"
-          /> <img
-          src={alegaimg}
-          alt="ALEGA"
-          width="160"
-          height="200"
-          className="col d-flex justify-content-end"
-        />
-      </div></div>
+<div className="container-fluid top-50">
+  <div className="row">
+    <div className="col d-flex justify-content-start">
+      <img src={meicimg} alt="MEIC" width="650" height="300" />
+    </div>
+    <div className="col d-flex justify-content-end">
+      <img src={alegaimg} alt="ALEGA" width="600" height="300" />
+    </div>
+  </div>
+
+  <br/>
+  <div className="row mt-5 text-center">
+    <div className="col">
+      <a href={"/formpres"} className="btn btn-success m-2">
+        Formulario Solicitud Asesoría
+      </a>
+      <a href={"/dashboard"} className="btn btn-success m-2">
+        Listado de Formularios
+      </a>
+      <a href={"/stadistic"} className="btn btn-success m-2">
+        Estadísticas
+      </a>
+    </div>
+  </div>
+</div>
     </>
   );
 }
