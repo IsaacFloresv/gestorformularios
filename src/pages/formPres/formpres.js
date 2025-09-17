@@ -248,31 +248,9 @@ const CompFormpres = () => {
   //#region Validacion de inputs
 
   const EnviarDatos = async (v) => {
-    let fecha = new Date();
-
-// Obtener la fecha en formato dd/mm/aaaa
-let fechaFormato = fecha.toLocaleDateString("es-ES", {
-  year: "numeric",
-  month: "numeric",
-  day: "numeric",
-});
-
-// Obtener la hora en formato hh:mm:ss
-let horaFormato = fecha.toLocaleTimeString("es-ES", {
-  hour: "numeric",
-  minute: "numeric",
-  second: "numeric",
-});
-
-// Concatenar la fecha y hora formateadas con una coma
-let fchareg = fechaFormato + ", " + horaFormato;
-
-// Eliminar el "0" delante de la hora si existe
-if (horaFormato.charAt(0) === "0") {
-  fchareg = fchareg.replace("0", "");
-}
-
-setFchareg(fchareg);
+    let fecha = new Date().toLocaleString();
+    let fchareg = fecha;
+    setFchareg(fecha);
 
     if (v === 1) {
       console.log("EnviarDatos se llama de forma reciproca");
@@ -492,24 +470,6 @@ setFchareg(fchareg);
         setIdcorreo("");
         setIdaudio("NO INDICA");
         break;
-
-      case 3:
-          setHiddentelorig("d-block col-md-3");
-          setdehabIdAudio("d-block col-md-3");
-          settoRegistro("");
-          setIdaudio("");
-          setIdcorreo("NO INDICA");
-          setdehabIdCorreo("d-none");
-          break;
-
-      case 4:
-          setHiddentelorig("d-block col-md-3");
-          setdehabIdAudio("d-block col-md-3");
-          settoRegistro("");
-          setIdaudio("");
-          setIdcorreo("NO INDICA");
-          setdehabIdCorreo("d-none");
-          break;
     }
   };
 
@@ -1637,8 +1597,6 @@ setFchareg(fchareg);
                 </option>
                 <option defaultValue="1">llamada entrante (linea 800)</option>
                 <option defaultValue="2">formulario web</option>
-                <option defaultValue="3">Atención Denuncias</option>
-                <option defaultValue="4">Atención Whatsapp</option>
               </select>
             </div>
             <div id="divinputtoRegistro" className={hiddentelorig}>
@@ -1707,7 +1665,6 @@ setFchareg(fchareg);
                 </option>
                 <option defaultValue="1">Escalar</option>
                 <option defaultValue="2">Atender con prontitud</option>
-                <option defaultValue="4">Recepción Denuncia</option>
               </select>
             </div>
             <div id="divinputtoRegistro" className={hiddentelObser}>
