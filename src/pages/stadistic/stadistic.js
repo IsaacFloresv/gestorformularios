@@ -974,6 +974,17 @@ function Stadistic() {
                   </a>
                 </li>
                 <li className="nav-item">
+                  <a
+                    href={"/racsabackup"}
+                    id="btnenviar"
+                    type="button"
+                    className="nav-link"
+                    aria-current="page"
+                  >
+                    Historico MEIC
+                  </a>
+                </li>
+                <li className="nav-item">
                   <Link
                     to={"/"}
                     id="btncerrar"
