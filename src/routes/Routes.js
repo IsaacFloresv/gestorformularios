@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from '../pages/login/login.js'
 import CompFormPrese from '../pages/formPres/CompoForm.js'
 import Dashboard from '../pages/dashboard/dashboard.js'
+import Racsabackup from '../pages/racsabackup/racsabackup.js'
 import Home from '../pages/home/home.js'
 import Stadistic from "../pages/stadistic/stadistic.js";
 import Edit from "../pages/edit/edit.js";
@@ -23,6 +24,7 @@ function Router() {
                     <Route replace path="/formpres" element={<CompFormPrese />} />
                     <Route replace path="/dashboard" element={<Dashboard />} />
                     <Route replace path="/stadistic" element={<Stadistic />} />
+                    <Route replace path="/racsabackup" element={<Racsabackup />} />
                     <Route replace path="/edit" element={<Edit />} />
                     <Route replace path="*" element={<Navigate replace to="/" />} />
                 </Route>
