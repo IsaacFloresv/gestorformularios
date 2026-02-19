@@ -1947,6 +1947,17 @@ const ValidarinputcedCEdit = (val) => {
                     onClick={() => CerrarSession()}
                     aria-current="page"
                   >
+                <li className="nav-item">
+                  <a
+                    href={"/racsabackup"}
+                    id="btnenviar"
+                    type="button"
+                    className="nav-link"
+                    aria-current="page"
+                  >
+                    Historico MEIC
+                  </a>
+                </li>
                     Salir
                   </Link>
                 </li>
