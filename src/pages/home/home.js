@@ -98,6 +98,16 @@ function Home() {
                     Estadisticas
                   </a>
                 </li>
+                <li class="nav-item">
+                  <a
+                    href={"/racsabackup"}
+                    id="btnenviar"
+                    type="button"
+                    className="nav-link"
+                    aria-current="page">
+                    Histórico Meic
+                  </a>
+                </li>
                 <li className="nav-item">
                   <Link
                     to={"/"}
@@ -139,6 +149,9 @@ function Home() {
       </a>
       <a href={"/stadistic"} className="btn btn-success m-2">
         Estadísticas
+      </a>
+      <a href={"/racsabackup"} className="btn btn-success m-2">
+        Histórico Meic
       </a>
     </div>
   </div>
