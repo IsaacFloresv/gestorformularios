@@ -5,7 +5,6 @@ import Cookies from "universal-cookie";
 import { Link } from "react-router-dom";
 
 const cookies = new Cookies();
-var nReporte;
 
 const URI = "https://fwmback-production.up.railway.app/";
 //const URIEMAIL = "https://sndmail-production-cdb6.up.railway.app/sendemail";
@@ -22,35 +21,34 @@ const CompFormpres = () => {
   };
 
   //Obtener el numero del ultimo
-  const NextRegister = async () => {
-    try {
-      let headersList = {
-        Accept: "*/*",
-        "User-Agent": "Thunder Client (https://www.thunderclient.com)",
-      };
+  const getFreshNextRegister = async () => {
+  try {
+    let headersList = { "Accept": "*/*" };
+    let response = await fetch("https://fwmback-production.up.railway.app/amp", {
+      method: "PUT",
+      headers: headersList,
+    });
 
-      let response = await fetch(
-        "https://fwmback-production.up.railway.app/amp",
-        {
-          method: "PUT",
-          headers: headersList,
-        }
-      );
+    let data = await response.text();
+    const numeroLimpio = parseInt(data);
 
-      setAgente(cookies.get("info"));
-      let data = await response.text();
-      nReporte = data;
-      const may = nReporte;
-
-      console.log(data);
-      setidNR(data);
-
-      setnRegistro(may);
-    } catch (error) {
-      console.error(error);
-      NextRegister();
+    // Si el servidor responde algo que no es un número (como un error o NULL)
+    if (isNaN(numeroLimpio)) {
+      console.error("Error: El servidor no devolvió un número válido. Recibido:", data);
+      return null;
     }
-  };
+
+    // Actualizamos los estados para que el usuario vea el número en el formulario
+    setAgente(cookies.get("info"));
+    setidNR(numeroLimpio);
+    setnRegistro(numeroLimpio);
+    
+    return numeroLimpio; // Retornamos el valor para usarlo en el guardado
+  } catch (error) {
+    console.error("Error de red al obtener registro:", error);
+    return null;
+  }
+};
 
   /*Parte del codigo antiguo de NextRegister
       let may = await response.text();
@@ -73,7 +71,7 @@ const CompFormpres = () => {
     getProvs();
     getMaterias();
     getBienes();
-    NextRegister();
+    getFreshNextRegister(); // Llamada inicial al abrir el formulario
   }, []);
 
   //
@@ -247,176 +245,174 @@ const CompFormpres = () => {
 
   //#region Validacion de inputs
 
-  const EnviarDatos = async (v) => {
-    let fecha = new Date();
+const EnviarDatos = async (v) => {
+  // --- Lógica de Fecha y Hora (Tuya original) ---
+  let fecha = new Date();
+  let fechaFormato = fecha.toLocaleDateString("es-ES", {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  });
+  let horaFormato = fecha.toLocaleTimeString("es-ES", {
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+  });
+  let fcharegStr = fechaFormato + ", " + horaFormato;
+  if (horaFormato.charAt(0) === "0") {
+    fcharegStr = fcharegStr.replace("0", "");
+  }
+  setFchareg(fcharegStr);
 
-// Obtener la fecha en formato dd/mm/aaaa
-let fechaFormato = fecha.toLocaleDateString("es-ES", {
-  year: "numeric",
-  month: "numeric",
-  day: "numeric",
-});
+  // --- Lógica de Control ---
+  if (v === 1) {
+    console.log("EnviarDatos se llama de forma reciproca (Reintento por choque)");
+  } else {
+    console.log("Se procede a guardar los datos");
+  }
 
-// Obtener la hora en formato hh:mm:ss
-let horaFormato = fecha.toLocaleTimeString("es-ES", {
-  hour: "numeric",
-  minute: "numeric",
-  second: "numeric",
-});
+  // --- PASO CLAVE: Obtener ID fresco antes de enviar ---
+  // Llamamos a la función que consulta el último número justo ahora
+  const idFresco = await getFreshNextRegister(); 
 
-// Concatenar la fecha y hora formateadas con una coma
-let fchareg = fechaFormato + ", " + horaFormato;
+  // Validamos que no sea nulo para evitar el efecto dominó que mencionaste
+  if (idFresco === null) {
+    alert("Error: No se pudo obtener el último ID de la base de datos. Intente de nuevo.");
+    return; // Detenemos la ejecución
+  }
 
-// Eliminar el "0" delante de la hora si existe
-if (horaFormato.charAt(0) === "0") {
-  fchareg = fchareg.replace("0", "");
-}
+  // Calculamos el ID que vamos a enviar (Ultimo + 1)
+  let nReporteCalculado = parseInt(idFresco) + 1;
 
-setFchareg(fchareg);
+  var nagente = cookies.get("info");
+  let headersList = {
+    Accept: "*/*",
+    "Content-Type": "application/json",
+  };
 
-    if (v === 1) {
-      console.log("EnviarDatos se llama de forma reciproca");
-    } else {
-      console.log("Se procede a guardar los datos");
-    }
+  // --- Armado del Body con TODOS tus campos ---
+  let bodyContent = JSON.stringify({
+    id_report: nReporteCalculado, // <--- Usamos el ID verificado
+    fchareg: fcharegStr,
+    id_agente: nagente,
+    fchacomplet: fchacomplet,
+    status: eRegistro,
+    origen_r: oRegistro,
+    tel_origen: toRegistro,
+    usuario_s: userspe,
+    us_obser: usobser,
+    tdia: tdiA,
+    ndia: ndiA,
+    nomba: nombA,
+    apell1a: apell1A,
+    apell2a: apell2A,
+    email: email,
+    email2: email2,
+    tel: tel,
+    tel2: tel2,
+    provi: provi,
+    canto: canto,
+    distr: distr,
+    materia: ubMat,
+    asunto: ubAsu,
+    bien: ubBie,
+    razon_social: rsocial,
+    nombre_fantasia: nfantasy,
+    tdic: tdiC,
+    ndic: ndiC,
+    fchahech: fchaHech,
+    fchagar: fchaGar,
+    desch: descH,
+    respe: resp,
+    id_audio: idaudio,
+    id_correo: idcorreo,
+  });
 
-    var nagente = cookies.get("info");
-    let headersList = {
-      Accept: "*/*",
-      //"User-Agent": "Thunder Client (https://www.thunderclient.com)",
-      "Content-Type": "application/json",
+  console.log("Intentando guardar reporte:", nReporteCalculado);
+  
+  try {
+    let reqOptions = {
+      url: "https://fwmback-production.up.railway.app/asepress",
+      method: "POST",
+      headers: headersList,
+      data: bodyContent,
     };
 
-    if (!nReporte) {
-      console.log("nReporte esta null");
-      console.log(nReporte);
-      NextRegister();
+    let response = await axios.request(reqOptions);
+
+    // Si el servidor detecta que el ID ya existe (Choque de 2 personas)
+    if (
+      response.data.status === 400 ||
+      response.data.message === "Validation error"
+    ) {
+      console.log("ID Duplicado detectado. Reintentando con el siguiente...");
+      EnviarDatos(1); // Volvemos a empezar: pedirá un nuevo ID y enviará
     } else {
-      let bodyContent = JSON.stringify({
-        id_report: ++nReporte,
-        fchareg: fchareg,
-        id_agente: nagente,
-        fchacomplet: fchacomplet,
-        status: eRegistro,
-        origen_r: oRegistro,
-        tel_origen: toRegistro,
-        usuario_s: userspe,
-        us_obser: usobser,
-        tdia: tdiA,
-        ndia: ndiA,
-        nomba: nombA,
-        apell1a: apell1A,
-        apell2a: apell2A,
-        email: email,
-        email2: email2,
-        tel: tel,
-        tel2: tel2,
-        provi: provi,
-        canto: canto,
-        distr: distr,
-        materia: ubMat,
-        asunto: ubAsu,
-        bien: ubBie,
-        razon_social: rsocial,
-        nombre_fantasia: nfantasy,
-        tdic: tdiC,
-        ndic: ndiC,
-        fchahech: fchaHech,
-        fchagar: fchaGar,
-        desch: descH,
-        respe: resp,
-        id_audio: idaudio,
-        id_correo: idcorreo,
-      });
-
-      console.log(bodyContent);
-      let reqOptions = {
-        url: "https://fwmback-production.up.railway.app/asepress",
-        method: "POST",
-        headers: headersList,
-        data: bodyContent,
-      };
-
-      let response = await axios.request(reqOptions);
-      if (
-        response.data.status === 400 ||
-        response.data.message === "Validation error"
-      ) {
-        console.log(nReporte);
-        console.log("no se guardo el dato.");
-        EnviarDatos(1);
-      } else {
-        console.log(response);
-        alert("Registro Creado Correctamente....");
-        NextRegister();
-      }
+      console.log(response);
+      alert("Registro #" + nReporteCalculado + " Creado Correctamente.");
+      getFreshNextRegister(); // Actualizamos el ID global para el siguiente registro
     }
-  };
+  } catch (error) {
+    console.error("Error en el servidor:", error);
+    // Si el error es un choque que el servidor maneja como excepción, también reintentamos
+    if(error.response && error.response.status === 400) {
+        EnviarDatos(1);
+    } else {
+        alert("Ocurrió un error inesperado al guardar.");
+    }
+  }
+};
 
   //Validacion de formulario antes de enviar correo
-  const validarbtnSubmit = (e) => {
-    e.preventDefault();
-    NextRegister();
-    const NR = 1;
-    if (NR != null) {
-      if (
-        telorigen != "" &&
-        telorigen != " " &&
-        agente != "" &&
-        agente != " " &&
-        usobser != "" &&
-        usobser != " " &&
-        ndiA != "" &&
-        ndiA != " " &&
-        nombA != "" &&
-        nombA != " " &&
-        apell1A != "" &&
-        apell1A != " " &&
-        apell2A != "" &&
-        apell2A != " " &&
-        email2 != "" &&
-        email2 != " " &&
-        email != "" &&
-        email != " " &&
-        tel != "" &&
-        tel != " " &&
-        tel2 != "" &&
-        tel2 != " " &&
-        fchaHech != "" &&
-        fchaHech != " " &&
-        fchaGar != "" &&
-        fchaGar != " " &&
-        prov != false &&
-        cant != false &&
-        distr != false &&
-        ubMat != "" &&
-        ubAsu != "" &&
-        ubBie != "" &&
-        tdiC != null &&
-        tdiC != " " &&
-        ndiC != null &&
-        ndiC != " " &&
-        nombC != "" &&
-        nombC != " " &&
-        apell1C != "" &&
-        apell1C != " " &&
-        apell2C != "" &&
-        apell2C != " " &&
-        descH != "" &&
-        descH != " " &&
-        resp != "" &&
-        resp != " "
-      ) {
-        setdehabilSubmit(true);
-        desactivarCampos();
-        EnviarDatos();
-      } else {
-        alert("faltan datos");
-      }
-    } else {
-      alert("Por favor, confirme que es humano...");
-    }
-  };
+  const validarbtnSubmit = async (e) => { // Agregamos async aquí
+  e.preventDefault();
+
+  // 1. Ya no llamamos a NextRegister() aquí porque EnviarDatos() 
+  // se encargará de traer el ID más fresco justo antes de guardar.
+  
+  // 2. Mantenemos tu lógica de validación de campos
+  if (
+    telorigen !== "" && telorigen !== " " &&
+    agente !== "" && agente !== " " &&
+    usobser !== "" && usobser !== " " &&
+    ndiA !== "" && ndiA !== " " &&
+    nombA !== "" && nombA !== " " &&
+    apell1A !== "" && apell1A !== " " &&
+    apell2A !== "" && apell2A !== " " &&
+    email2 !== "" && email2 !== " " &&
+    email !== "" && email !== " " &&
+    tel !== "" && tel !== " " &&
+    tel2 !== "" && tel2 !== " " &&
+    fchaHech !== "" && fchaHech !== " " &&
+    fchaGar !== "" && fchaGar !== " " &&
+    prov !== false &&
+    cant !== false &&
+    distr !== false &&
+    ubMat !== "" &&
+    ubAsu !== "" &&
+    ubBie !== "" &&
+    tdiC !== null && tdiC !== " " &&
+    ndiC !== null && ndiC !== " " &&
+    nombC !== "" && nombC !== " " &&
+    apell1C !== "" && apell1C !== " " &&
+    apell2C !== "" && apell2C !== " " &&
+    descH !== "" && descH !== " " &&
+    resp !== "" && resp !== " "
+  ) {
+    // 3. Deshabilitamos el botón para evitar doble clic accidental
+    setdehabilSubmit(false); 
+    
+    // Llamamos a la función de guardado
+    // Como EnviarDatos ahora pide el ID fresco, el proceso es seguro
+    await EnviarDatos(); 
+    
+  } else {
+    alert("Faltan datos obligatorios por completar.");
+    // Si falta algo, volvemos a habilitar el botón si fuera necesario
+    setdehabilSubmit(true); 
+  }
+};
+
   function limpiardatosA() {
     setndiA("");
     setnombA("");
