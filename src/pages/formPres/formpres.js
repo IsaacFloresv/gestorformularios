@@ -400,7 +400,7 @@ const EnviarDatos = async (v) => {
     resp !== "" && resp !== " "
   ) {
     // 3. Deshabilitamos el botón para evitar doble clic accidental
-    setdehabilSubmit(false); 
+    setdehabilSubmit(true); 
     
     // Llamamos a la función de guardado
     // Como EnviarDatos ahora pide el ID fresco, el proceso es seguro
@@ -409,7 +409,7 @@ const EnviarDatos = async (v) => {
   } else {
     alert("Faltan datos obligatorios por completar.");
     // Si falta algo, volvemos a habilitar el botón si fuera necesario
-    setdehabilSubmit(true); 
+    setdehabilSubmit(false); 
   }
 };
 
