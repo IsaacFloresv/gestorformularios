@@ -1617,12 +1617,12 @@ function Dashboard() {
 
   //Funciones para vistas
 
-  const opcionesSelect = [
-    { label: "Origen año 2024", value: 3 },
-    { label: "Origen año 2023", value: 1 },
-    { label: "Origen año 2022", value: 2 },
-    // Agrega más opciones si es necesario
-  ];
+const opcionesSelect = [
+  { label: "Origen año 2025", value: "2025" },
+  { label: "Origen año 2024", value: "2024" },
+  { label: "Origen año 2023", value: "2023" },
+  { label: "Origen año 2022", value: "2022" },
+];
 
   const descargarTabla = (opcionSeleccionada) => {
     // Obtener datos necesarios para la tabla
@@ -1651,194 +1651,51 @@ function Dashboard() {
   };
   
 
-  const obtenerDatosParaTabla = (opcionSeleccionada) => {
-    if (opcionSeleccionada === 1) {
-     // Obtén los datos necesarios para la tabla (por ejemplo, los datos filtrados)
-    const datosFiltrados = allreportes.filter(reporte => {
-    const [fechaPart] = reporte.fchareg.split(', ');
-    const [fecha] = fechaPart.split(' ');
-
-    const [dia, mes, ano] = fecha.split('/');
-    return ano === '2023';
-  });
-
-  // Crear un objeto para almacenar el recuento de reportes por origen y mes
-  const recuentoPorMesYOrigen = {};
-
-  // Iterar sobre los reportes y contar por origen y mes
-  datosFiltrados.forEach(reporte => {
-    const nombreMes = obtenerNombreMes(reporte);
-    const origen = reporte.origen_r;
-
-    // Inicializar el recuento si es la primera vez que vemos este origen en este mes
-    if (!recuentoPorMesYOrigen[nombreMes]) {
-      recuentoPorMesYOrigen[nombreMes] = {};
-    }
-    if (!recuentoPorMesYOrigen[nombreMes][origen]) {
-      recuentoPorMesYOrigen[nombreMes][origen] = 0;
-    }
-
-    // Incrementar el recuento
-    recuentoPorMesYOrigen[nombreMes][origen]++;
-  });
-
-  // Transformar el objeto y calcular el total por origen
-  const datosTabla = Object.keys(recuentoPorMesYOrigen).map(mes => {
-    const recuentoPorOrigen = recuentoPorMesYOrigen[mes];
-    const fila = {
-      Mes: mes,
-      ...recuentoPorOrigen,
-    };
-
-    // Calcular el total por origen y agregarlo a la fila
-    fila.Total = Object.values(recuentoPorOrigen).reduce((total, count) => total + count, 0);
-
-    return fila;
-  });
-
-  // Agregar la fila de totales al final
-  const filaTotales = {
-    Mes: 'Total',
-    ...Object.keys(recuentoPorMesYOrigen).reduce((totales, mes) => {
-      Object.keys(recuentoPorMesYOrigen[mes]).forEach(origen => {
-        if (!totales[origen]) {
-          totales[origen] = 0;
-        }
-        totales[origen] += recuentoPorMesYOrigen[mes][origen];
-      });
-      return totales;
-    }, {}),
-  };
-
-  datosTabla.push(filaTotales);
-
-  return datosTabla;
-    }
-    else if (opcionSeleccionada === 2) {
-     // Obtén los datos necesarios para la tabla (por ejemplo, los datos filtrados)
+  const obtenerDatosParaTabla = (anioSeleccionado) => {
+  // 1. Filtrar por el año dinámicamente
   const datosFiltrados = allreportes.filter(reporte => {
     const [fechaPart] = reporte.fchareg.split(', ');
     const [fecha] = fechaPart.split(' ');
-
-    const [dia, mes, ano] = fecha.split('/');
-    return ano === '2022';
+    const [,, ano] = fecha.split('/'); // Usamos solo el tercer elemento
+    return ano === String(anioSeleccionado);
   });
 
-  // Crear un objeto para almacenar el recuento de reportes por origen y mes
+  // 2. Agrupar por mes y origen
   const recuentoPorMesYOrigen = {};
 
-  // Iterar sobre los reportes y contar por origen y mes
   datosFiltrados.forEach(reporte => {
     const nombreMes = obtenerNombreMes(reporte);
     const origen = reporte.origen_r;
 
-    // Inicializar el recuento si es la primera vez que vemos este origen en este mes
     if (!recuentoPorMesYOrigen[nombreMes]) {
       recuentoPorMesYOrigen[nombreMes] = {};
     }
-    if (!recuentoPorMesYOrigen[nombreMes][origen]) {
-      recuentoPorMesYOrigen[nombreMes][origen] = 0;
-    }
-
-    // Incrementar el recuento
-    recuentoPorMesYOrigen[nombreMes][origen]++;
+    recuentoPorMesYOrigen[nombreMes][origen] = (recuentoPorMesYOrigen[nombreMes][origen] || 0) + 1;
   });
 
-  // Transformar el objeto y calcular el total por origen
+  // 3. Transformar a formato tabla
   const datosTabla = Object.keys(recuentoPorMesYOrigen).map(mes => {
     const recuentoPorOrigen = recuentoPorMesYOrigen[mes];
-    const fila = {
-      Mes: mes,
-      ...recuentoPorOrigen,
-    };
-
-    // Calcular el total por origen y agregarlo a la fila
-    fila.Total = Object.values(recuentoPorOrigen).reduce((total, count) => total + count, 0);
-
+    const fila = { Mes: mes, ...recuentoPorOrigen };
+    
+    fila.Total = Object.values(recuentoPorOrigen).reduce((a, b) => a + b, 0);
     return fila;
   });
 
-  // Agregar la fila de totales al final
-  const filaTotales = {
-    Mes: 'Total',
-    ...Object.keys(recuentoPorMesYOrigen).reduce((totales, mes) => {
-      Object.keys(recuentoPorMesYOrigen[mes]).forEach(origen => {
-        if (!totales[origen]) {
-          totales[origen] = 0;
-        }
-        totales[origen] += recuentoPorMesYOrigen[mes][origen];
-      });
-      return totales;
-    }, {}),
-  };
+  // 4. Fila de totales finales
+  const filaTotales = { Mes: 'Total' };
+  datosTabla.forEach(fila => {
+    if (fila.Mes === 'Total') return;
+    Object.keys(fila).forEach(key => {
+      if (key !== 'Mes') {
+        filaTotales[key] = (filaTotales[key] || 0) + fila[key];
+      }
+    });
+  });
 
   datosTabla.push(filaTotales);
-
   return datosTabla;
-    }
-    else if (opcionSeleccionada === 3) {
-      // Obtén los datos necesarios para la tabla (por ejemplo, los datos filtrados)
-   const datosFiltrados = allreportes.filter(reporte => {
-     const [fechaPart] = reporte.fchareg.split(', ');
-     const [fecha] = fechaPart.split(' ');
- 
-     const [dia, mes, ano] = fecha.split('/');
-     return ano === '2024';
-   });
- 
-   // Crear un objeto para almacenar el recuento de reportes por origen y mes
-   const recuentoPorMesYOrigen = {};
- 
-   // Iterar sobre los reportes y contar por origen y mes
-   datosFiltrados.forEach(reporte => {
-     const nombreMes = obtenerNombreMes(reporte);
-     const origen = reporte.origen_r;
- 
-     // Inicializar el recuento si es la primera vez que vemos este origen en este mes
-     if (!recuentoPorMesYOrigen[nombreMes]) {
-       recuentoPorMesYOrigen[nombreMes] = {};
-     }
-     if (!recuentoPorMesYOrigen[nombreMes][origen]) {
-       recuentoPorMesYOrigen[nombreMes][origen] = 0;
-     }
- 
-     // Incrementar el recuento
-     recuentoPorMesYOrigen[nombreMes][origen]++;
-   });
- 
-   // Transformar el objeto y calcular el total por origen
-   const datosTabla = Object.keys(recuentoPorMesYOrigen).map(mes => {
-     const recuentoPorOrigen = recuentoPorMesYOrigen[mes];
-     const fila = {
-       Mes: mes,
-       ...recuentoPorOrigen,
-     };
- 
-     // Calcular el total por origen y agregarlo a la fila
-     fila.Total = Object.values(recuentoPorOrigen).reduce((total, count) => total + count, 0);
- 
-     return fila;
-   });
- 
-   // Agregar la fila de totales al final
-   const filaTotales = {
-     Mes: 'Total',
-     ...Object.keys(recuentoPorMesYOrigen).reduce((totales, mes) => {
-       Object.keys(recuentoPorMesYOrigen[mes]).forEach(origen => {
-         if (!totales[origen]) {
-           totales[origen] = 0;
-         }
-         totales[origen] += recuentoPorMesYOrigen[mes][origen];
-       });
-       return totales;
-     }, {}),
-   };
- 
-   datosTabla.push(filaTotales);
- 
-   return datosTabla;
-     }
-  };
+};
   
   const obtenerNombreMes = (reporte) => {
     const [fechaPart] = reporte.fchareg.split(', ');
