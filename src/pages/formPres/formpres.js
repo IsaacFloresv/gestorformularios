@@ -160,7 +160,6 @@ const CompFormpres = () => {
   const [deshabProv, setdeshabProv] = useState(false);
   const [deshabCant, setdeshabCant] = useState(true);
   const [deshabDist, setdeshabDist] = useState(true);
-  const [dehabilndiC, setdehabilndiC] = useState(false);
   const [deshabIdAudio, setdehabIdAudio] = useState("d-none col-md-3");
   const [deshabIdCorreo, setdehabIdCorreo] = useState("d-none col-md-3");
   const [dehabilnombC, setdehabilnombC] = useState(false);
@@ -370,7 +369,7 @@ const EnviarDatos = async (v) => {
   // 1. Ya no llamamos a NextRegister() aquí porque EnviarDatos() 
   // se encargará de traer el ID más fresco justo antes de guardar.
   
-  // 2. Mantenemos tu lógica de validación de campos
+  // 2. Mantenemos la lógica de validación de campos
   if (
     telorigen !== "" && telorigen !== " " &&
     agente !== "" && agente !== " " &&
@@ -399,17 +398,42 @@ const EnviarDatos = async (v) => {
     descH !== "" && descH !== " " &&
     resp !== "" && resp !== " "
   ) {
-    // 3. Deshabilitamos el botón para evitar doble clic accidental
+    // 3. Deshabilitamos el botón y los campos para evitar doble clic accidental
     setdehabilSubmit(true); 
+    setCamposDeshabilitados(true);
+    setdeshabCant(true);
+    setdeshabDist(true);
+    setdeshabMateria(true);
+    setdeshabAConsultado(true);
+    setdehabiltel1(true);
+    setdehabiltel2(true);
+    setdehabilem1(true);
+    setdehabilem2(true);
     
+  try {
     // Llamamos a la función de guardado
-    // Como EnviarDatos ahora pide el ID fresco, el proceso es seguro
-    await EnviarDatos(); 
-    
+      await EnviarDatos();
+
+    } catch (error) {
+
+      // Si falla el guardado, vuelves a habilitar
+      setdehabilSubmit(false);
+      setCamposDeshabilitados(false);
+      setdeshabCant(false);
+      setdeshabDist(false);
+      setdeshabMateria(false);
+      setdeshabAConsultado(false);
+      setdehabiltel1(false);
+      setdehabiltel2(false);
+      setdehabilem1(false);
+      setdehabilem2(false);
+
+      console.log(error);
+    }
+
   } else {
+
     alert("Faltan datos obligatorios por completar.");
-    // Si falta algo, volvemos a habilitar el botón si fuera necesario
-    setdehabilSubmit(false); 
   }
 };
 
@@ -1607,6 +1631,7 @@ const EnviarDatos = async (v) => {
                   let estReg = e.target.options[index].text;
                   seteRegistro(estReg);
                 }}
+                disabled={camposDeshabilitados}
                 required
               >
                 <option defaultValue="DEFAULT" value="0">
@@ -1626,6 +1651,7 @@ const EnviarDatos = async (v) => {
                 className="form-select"
                 name="eRegistro"
                 onChange={(e) => OrigenChange(e)}
+                disabled={camposDeshabilitados}
                 required
               >
                 <option defaultValue="DEFAULT" value="0">
@@ -1650,6 +1676,7 @@ const EnviarDatos = async (v) => {
                 onChange={(e) => {
                   settoRegistro(e.target.value);
                 }}
+                disabled={camposDeshabilitados}
                 required
               />
               <span id="errorCed" className="fs-6"></span>
@@ -1667,6 +1694,7 @@ const EnviarDatos = async (v) => {
                 onChange={(e) => {
                   setIdaudio(e.target.value);
                 }}
+                disabled={camposDeshabilitados}
                 required
               />
             </div>
@@ -1683,6 +1711,7 @@ const EnviarDatos = async (v) => {
                 onChange={(e) => {
                   setIdcorreo(e.target.value);
                 }}
+                disabled={camposDeshabilitados}
                 required
               />
             </div>
@@ -1696,6 +1725,7 @@ const EnviarDatos = async (v) => {
                 className="form-select"
                 name="userEspe"
                 onChange={(e) => UsSpeChange(e)}
+                disabled={camposDeshabilitados}
                 required
               >
                 <option defaultValue="DEFAULT" value="0">
@@ -1719,6 +1749,7 @@ const EnviarDatos = async (v) => {
                 onChange={(e) => {
                   setUsobser(e.target.value);
                 }}
+                disabled={camposDeshabilitados}
                 required
               />
             </div>
@@ -1740,6 +1771,7 @@ const EnviarDatos = async (v) => {
               onChange={(e) =>
                 input_TIDchange(e.target.selectedIndex, e.target.value)
               }
+              disabled={camposDeshabilitados}
               required
             >
               <option defaultValue="DEFAULT" value="0" disabled>
@@ -1765,7 +1797,7 @@ const EnviarDatos = async (v) => {
                 validarInputCedA(e.target.value, "1");
               }}
               required
-              disabled={dehabil}
+              disabled={camposDeshabilitados}
             />
             <div className="invalid-feedback">
               Por favor, ingrese su numero de indentificación.
@@ -1791,7 +1823,7 @@ const EnviarDatos = async (v) => {
                 id="inputName"
                 value={nombA}
                 onChange={(e) => ValidarinputNomb(e.target.value, "1")}
-                disabled={dehabil}
+                disabled={camposDeshabilitados}
                 required
               />
               <div className="invalid-feedback">{fbNameA}</div>
@@ -1809,7 +1841,7 @@ const EnviarDatos = async (v) => {
               id="input1erAp"
               value={apell1A}
               onChange={(e) => ValidarinputApp1(e.target.value)}
-              disabled={dehabil}
+              disabled={camposDeshabilitados}
               required
             />
             <div className="invalid-feedback">{fbApell1A}</div>
@@ -1826,7 +1858,7 @@ const EnviarDatos = async (v) => {
               id="input2doAp"
               value={apell2A}
               onChange={(e) => ValidarinputApp2(e.target.value)}
-              disabled={dehabil}
+              disabled={camposDeshabilitados}
               required
             />
             <div className="invalid-feedback">
@@ -1844,7 +1876,7 @@ const EnviarDatos = async (v) => {
               type="checkbox"
               id="naemail1"
               checked={checkem1}
-              disabled={dehabil}
+              disabled={camposDeshabilitados}
               onChange={(e) => changeTeloEmail(e, 3)}
             />
             <label className="form-check-label fs-6" htmlFor="naemail2">
@@ -1874,7 +1906,7 @@ const EnviarDatos = async (v) => {
               type="checkbox"
               id="naemail2"
               checked={checkem2}
-              disabled={dehabil}
+              disabled={camposDeshabilitados}
               onChange={(e) => changeTeloEmail(e, 1)}
             />
             <label className="form-check-label fs-6" htmlFor="naemail2">
@@ -1900,7 +1932,7 @@ const EnviarDatos = async (v) => {
               type="checkbox"
               id="flexCheckDefault"
               checked={checktel1}
-              disabled={dehabil}
+              disabled={camposDeshabilitados}
               onChange={(e) => changeTeloEmail(e, 4)}
             />
             <label className="form-check-label fs-6" htmlFor="flexCheckDefault">
@@ -1926,7 +1958,7 @@ const EnviarDatos = async (v) => {
               type="checkbox"
               id="flexCheckDefault"
               checked={checktel2}
-              disabled={dehabil}
+              disabled={camposDeshabilitados}
               onChange={(e) => changeTeloEmail(e, 2)}
             />
             <label className="form-check-label fs-6" htmlFor="flexCheckDefault">
@@ -1956,7 +1988,7 @@ const EnviarDatos = async (v) => {
               name="prov"
               id="inputprov"
               className="form-select"
-              disabled={deshabProv}
+              disabled={camposDeshabilitados}
               onChange={(e) => getCants(e)}
               defaultValue={ubProv}
               required
@@ -2125,6 +2157,7 @@ const EnviarDatos = async (v) => {
               id="selectBien"
               required
               onChange={(e) => defbien(e)}
+              disabled={deshabBien}
               defaultValue={idBie}
               options={bien.map((bien) => ({
                 label: bien.desc_bien,
@@ -2146,7 +2179,7 @@ const EnviarDatos = async (v) => {
               id="input_TIDC"
               defaultValue={selectNidC}
               className="form-select"
-              disabled={dehabil}
+              disabled={camposDeshabilitados}
               onChange={(e) =>
                 input_TIDCchange(e.target.selectedIndex, e.target.value)
               }
@@ -2176,7 +2209,7 @@ const EnviarDatos = async (v) => {
               id="inputCedC"
               value={ndiC}
               onChange={(e) => validarInputCedC(e.target.value, "2")}
-              disabled={dehabilndiC}
+              disabled={camposDeshabilitados}
               required
             />
             <div className="invalid-feedback">
@@ -2202,6 +2235,7 @@ const EnviarDatos = async (v) => {
                 id="inputNameC"
                 value={nombC}
                 onChange={(e) => ValidarinputNombC(e.target.value, "2")}
+                disabled={camposDeshabilitados}
                 required
               />
               <div className="invalid-feedback">{fbNameC}</div>
@@ -2219,6 +2253,7 @@ const EnviarDatos = async (v) => {
               id="input1erApC"
               value={apell1C}
               onChange={(e) => ValidarinputApp1C(e.target.value)}
+              disabled={camposDeshabilitados}
               required
             />
             <div className="invalid-feedback">{fbApell1C}</div>
@@ -2234,6 +2269,7 @@ const EnviarDatos = async (v) => {
               id="input2doApC"
               value={apell2C}
               onChange={(e) => ValidarinputApp2C(e.target.value)}
+              disabled={camposDeshabilitados}
               required
             />
             <div className="invalid-feedback">
@@ -2256,7 +2292,7 @@ const EnviarDatos = async (v) => {
               value={descH}
               rows="10"
               onChange={(e) => ValidarinputHecho(e.target.value)}
-              disabled={dehabil}
+              disabled={camposDeshabilitados}
               required
             ></textarea>
             <div className="invalid-feedback">
@@ -2274,7 +2310,7 @@ const EnviarDatos = async (v) => {
               value={resp}
               rows="10"
               onChange={(e) => ValidarinputResp(e.target.value)}
-              disabled={dehabil}
+              disabled={camposDeshabilitados}
               required
             ></textarea>
             <div className="invalid-feedback">
